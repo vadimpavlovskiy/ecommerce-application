@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { Banner } from "./layouts/Banner";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-
+    <main className="mx-[150px]">
+      <Banner />
     </main>
   );
 }
