@@ -2,8 +2,8 @@ import Image from 'next/image'
 import React from 'react'
 
 import {Nunito} from 'next/font/google'
-
 const nunito = Nunito({ subsets: ['latin'], weight: ['900'] })
+
 export const Banner = () => {
   return (
     <div className='flex flex-col'>
