@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->text('description')->nullable();
             $table->string('sku')->unique();
             $table->integer('length');
             $table->integer('width');
@@ -22,7 +23,6 @@ return new class extends Migration
             $table->integer('sleeping_area_width');
             $table->decimal('price', 8, 2);
             $table->decimal('discounted_price', 8, 2)->nullable();
-            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
