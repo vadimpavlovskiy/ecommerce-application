@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <main className="mx-[150px] max-lg:mx-[20px]">
       <Banner />
-      <div className="mt-10">
+      <div className="mt-[2.5rem]">
         <Features />
         <HeroSection
         imageSrc={"/hero_furniture.jpg"}

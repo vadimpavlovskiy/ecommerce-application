@@ -1,14 +1,20 @@
+'use client'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { HeroSectionProps } from '../types/layoutTypes/HeroSection'
 
 import {Nunito} from 'next/font/google'
 import {Raleway} from 'next/font/google'
+import { fetchProducts } from '../api/productApi'
 
-const nunito = Nunito({ subsets: ['latin'], weight: ['900'] })
+const nunito = Nunito({ subsets: ['latin'], weight: ['700'] })
 const raleway = Raleway({ subsets: ['latin'] })
 
 export const HeroSection = ({imageSrc, heading, desc, stats}: HeroSectionProps) => {
+  useEffect(() => {
+    console.log(fetchProducts());
+  }, [])
+  
     return (
       <div className='flex w-full min-w-[1620px] mt-[150px]'>
         <div className='relative w-[547px] h-[550px] flex-shrink-0'>
