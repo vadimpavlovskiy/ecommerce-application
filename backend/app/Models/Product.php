@@ -12,11 +12,25 @@ class Product extends Model
 
     protected $casts = [
         'price' => MoneyCast::class,
-        'discounted_price' => MoneyCast::class
+        'discounted_price' => MoneyCast::class,
+        'custom_properties' => 'array',
     ];
     protected $fillable = [
-        'name', 'sku', 'length', 'width', 'height', 'sleeping_area_length', 'sleeping_area_width', 'price', 'discounted_price', 'description'
+        'name', 
+        'description', 
+        'sku', 
+        'length', 
+        'width',
+        'height', 
+        'sleeping_area_length', 'sleeping_area_width', 
+        'price', 
+        'discounted_price', 
+        'thumbnail',
+        'image',
+        'custom_properties'
     ];
+
+    
 
     protected static function boot()
     {

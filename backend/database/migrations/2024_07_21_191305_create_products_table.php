@@ -23,6 +23,9 @@ return new class extends Migration
             $table->integer('sleeping_area_width');
             $table->decimal('price', 8, 2);
             $table->decimal('discounted_price', 8, 2)->nullable();
+            $table->string('thumbnail')->required();
+            $table->string('image')->required();
+            $table->json('custom_properties')->nullable();
             $table->timestamps();
         });
     }
