@@ -7,8 +7,12 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -34,6 +38,8 @@ class ProductResource extends Resource
                 TextInput::make('name')->required()->maxLength(255),
                 RichEditor::make('description')->required()->maxLength(1200)->columnSpan('full'),
                 TextInput::make('sku')->required()->minLength(5)->maxLength(300)->required()->string(),
+                FileUpload::make('image')->required(),
+                RichEditor::make('thumbnail')->required()->maxLength(255)->columnSpan('full'),
                 Section::make('Properties')
                 ->description('Properties of product')
                 ->schema([
@@ -68,6 +74,44 @@ class ProductResource extends Resource
                         }),
                     'Discrounted Price' => TextInput::make('discounted_price')->numeric()->prefix('$')->maxValue(9999999.99)->visible(fn (Get $get): bool => $get('is_discount') || $get('discounted_price') !== null || $get('discounted_price') > 0.0 || $get('discounted_price' !== 0))->nullable()->live()
                 ]),
+                Repeater::make('custom_properties')
+                ->schema([
+                    Select::make('type')->options([
+                        'characteristic' => 'Characteristic',
+                        'color' => 'Color',
+                        'textile' => 'Textile',
+                        'additional_features' => 'Additional features'
+                    ])
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set, Get $get) => $set('dynamicTypeFields', $get('type'))),
+                    Grid::make(2)
+                        ->schema(fn (Get $get): array => match ($get('dynamicTypeFields')) {
+                            'color' => [
+                                TextInput::make('name')->required()->label('Color Name'),
+                                FileUpload::make('image')->required()->label('Color Image'),
+                                TextInput::make('price')->required()->label('Color Price')->numeric(),
+                            ],
+                            'characteristic' => [
+                                TextInput::make('key')->required()->label('Property Name'),
+                                TextInput::make('value')->required()->label('Property Value'),
+                            ],
+                            'textile' => [
+                                TextInput::make('name')->required()->label('Textile Name'),
+                                TextInput::make('price')->required()->label('Add to price')->numeric(),
+                            ],
+                            'additional_features' => [
+                                TextInput::make('name') -> label('Feature Name') -> required(),
+                                TextInput::make('price') -> label('Feature Price')  -> numeric() -> required()
+                            ],
+                            default => [],
+                        })
+                        ->key('dynamicTypeFields'),
+                ])
+                ->label('Custom Properties')
+                ->defaultItems(1)
+                ->columns(2)
+                ->minItems(0)
+                ->columnSpanFull()
             ]);
     }
 

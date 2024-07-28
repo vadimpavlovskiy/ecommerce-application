@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ProductController extends Controller
 {
     public function index() {
         $products = Product::all();
-        return response()->json($products);
+        $sessionData = Session::get()->all();
+        return response()->json($products, $sessionData);
     }
 
     public function show($id) {
