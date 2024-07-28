@@ -21,7 +21,7 @@ Route::controller(OrderController::class)->group(function () {
 Route::controller(CartController::class)->group(function () {
     Route::post('/api/cart/add', [CartController::class, 'add']);
     Route::post('/api/cart/update', [CartController::class, 'update']);
-    Route::post('/api/cart/delete', [CartController::class, 'delete']);
-    Route::get('/api/cart', [CartController::class, 'view']);
+    Route::post('/api/cart/delete', [CartController::class, 'removeFromCart']);
+    Route::get('/api/cart', [CartController::class, 'show']);
 });
 

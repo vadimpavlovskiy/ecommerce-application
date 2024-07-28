@@ -58,6 +58,8 @@ class CartController extends Controller
         } else {
             $items[$productKey] = [
                 'productId' => $validatedData['productId'],
+                'name' => $product['name'],
+                'image' => $product['image'],
                 'color' => $validatedData['color'],
                 'textile' => $validatedData['textile'],
                 'matress' => $validatedData['matress'],
@@ -66,6 +68,7 @@ class CartController extends Controller
                 'totalPrice' => $totalPrice,
             ];
         }
+        unset($items[$productKey]['cart_id']);
 
         $cart->items = json_encode($items);
         $cart->save();
@@ -105,9 +108,9 @@ class CartController extends Controller
             'cart_id' => 'required|string'
         ]);
 
-        $cart = Cart::where('cart_id', $validatedData['cart_id']);
+        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
 
-        return response()->json($cart ? $cart->items : []);
+        return response()->json(json_decode($cart->items));
 
     }
 }
