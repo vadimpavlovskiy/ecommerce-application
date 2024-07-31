@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 export const fetchProducts = async () => {
   setTimeout(async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/products");
+      const response = await axios.get("http://157.230.208.159/api/products");
       return response.data;
     } catch (error) {
       console.log("====================================");
@@ -16,7 +16,7 @@ export const fetchProducts = async () => {
 export const fetchProductById = async (id: number) => {
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8000/api/products/${id}`
+      `http://157.230.208.159/api/products/${id}`
     );
     return response.data;
   } catch (error) {
