@@ -15,7 +15,7 @@ export default function CartComponent() {
 
   async function updateCart(quantity: number, key:string) {
     try {
-      const response = await axios.put(`http://127.0.0.1:8000/api/cart/update?cart_id=${savedCartId}&quantity=${Number(quantity)}&key=${key}`);
+      const response = await axios.put(`http://157.230.208.159/api/cart/update?cart_id=${savedCartId}&quantity=${Number(quantity)}&key=${key}`);
       console.log(response.data.items)
       dispatch({ type: 'UPDATE_CART', payload: response.data.items });
 
@@ -25,7 +25,7 @@ export default function CartComponent() {
   }
   async function getCart() {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/cart?cart_id=${savedCartId}`);
+      const response = await axios.get(`http://157.230.208.159/api/cart?cart_id=${savedCartId}`);
       dispatch({ type: 'SET_CART', payload: response.data });
 
     } catch (error) {
@@ -35,7 +35,7 @@ export default function CartComponent() {
 
   async function deleteItem(key:string) {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/cart/delete?cart_id=${savedCartId}&key=${key}`)
+      await axios.delete(`http://157.230.208.159/api/cart/delete?cart_id=${savedCartId}&key=${key}`)
       dispatch({ type: 'DELETE_ITEM', payload: key });
 
     } catch(error) {
