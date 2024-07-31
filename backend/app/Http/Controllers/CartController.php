@@ -48,24 +48,27 @@ class CartController extends Controller
             }
         }
 
-        $totalPrice *= $validatedData['quantity'];
-
         // Generate a unique key for the product configuration
         $productKey = $validatedData['productId'] . '-' . $validatedData['color'] . '-' . $validatedData['textile'] . '-' . $validatedData['matress'] . '-' . implode('-', $validatedData['additionalFeatures']);
 
         if (isset($items[$productKey])) {
             $items[$productKey]['quantity'] += $validatedData['quantity'];
+            $items[$productKey]['totalPrice'] = $totalPrice * $items[$productKey]['quantity'];
+            
         } else {
             $items[$productKey] = [
                 'productId' => $validatedData['productId'],
+                'name' => $product['name'],
+                'image' => $product['image'],
                 'color' => $validatedData['color'],
                 'textile' => $validatedData['textile'],
                 'matress' => $validatedData['matress'],
                 'additionalFeatures' => $validatedData['additionalFeatures'],
                 'quantity' => $validatedData['quantity'],
-                'totalPrice' => $totalPrice,
+                'totalPrice' => $totalPrice * $validatedData['quantity'],
             ];
         }
+        unset($items[$productKey]['cart_id']);
 
         $cart->items = json_encode($items);
         $cart->save();
@@ -74,40 +77,89 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Product added to cart successfully',
             'cart' => json_decode($cart->items),
+            'total_price' => $items[$productKey]
         ], 201);
 
 
     }
 
-    public function removeFromCart(Request $request)
-    {
-        $validatedData = $request->validate([
-            'cart_id' => 'required|string',
-            'product_id' => 'required|string'
-        ]);
-
-        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
-
-        if ($cart) {
-            $items = $cart->items ?: [];
-            if (isset($items[$validatedData['product_id']])) {
-                unset($items[$validatedData['product_id']]);
-                $cart->items = $items;
-                $cart->save();
-            }
-        }
-
-        return response()->json(['message' => 'Product removed from cart']);
-    }
 
     public function show (Request $request) {
         $validatedData = $request->validate([
             'cart_id' => 'required|string'
         ]);
 
-        $cart = Cart::where('cart_id', $validatedData['cart_id']);
+        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
 
-        return response()->json($cart ? $cart->items : []);
+        return response()->json(json_decode($cart->items));
 
+    }
+
+    public function update (Request $request) {
+        $validatedData = $request->validate([
+            'cart_id' => 'required|string',
+            'quantity' => 'integer|required|min:1',
+            'key' => 'string|required'
+        ]);
+        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
+        $items = json_decode($cart->items, true);
+        $product = Product::findOrFail($items[$validatedData['key']]['productId']);
+        $totalPrice = $product->discounted_price ? $product->discounted_price : $product->price;
+        if (array_key_exists($validatedData['key'], $items)) {
+            // Here we must recalculate an price base on product data to be sure that price would be stable
+            foreach ($product->custom_properties as $property) {
+                if ($property['type'] === 'color' && strtolower($property['name']) === strtolower($items[$validatedData['key']]['color'])) {
+                    $totalPrice += $property['price'];
+                }
+                if ($property['type'] === 'textile' && strtolower($property['name']) === strtolower($items[$validatedData['key']]['textile'])) {
+                    $totalPrice += $property['price'];
+                }
+            }
+    
+            if (!empty($items[$validatedData['key']]['additionalFeatures'])) {
+                foreach ($items[$validatedData['key']]['additionalFeatures'] as $feature) {
+                    foreach ($product->custom_properties as $property) {
+                        if ($property['type'] === 'additional_features' && strtolower($property['name']) === strtolower($feature)) {
+                            $totalPrice += $property['price'];
+                            break;
+                        }
+                    }
+                }
+            }
+            $totalPrice *= $validatedData['quantity'];
+            
+            $items[$validatedData['key']]['quantity'] = (int)$validatedData['quantity'];
+            $items[$validatedData['key']]['totalPrice'] = $totalPrice;
+        } else {
+            return response()->json(['message' => 'Item not found'], 404);
+        }
+    
+        // Encode the items back to JSON and save
+        $cart->items = json_encode($items);
+        $cart->save();
+    
+        return response()->json(['message' => 'Updated', 'items'=> $items, 'total'=>$totalPrice]);
+    }
+
+    public function delete (Request $request) {
+        $validatedData = $request->validate([
+            'cart_id' => 'required|string',
+            'key' => 'string|required'
+        ]);
+        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
+        $items = json_decode($cart->items, true);
+
+        if (array_key_exists($validatedData['key'], $items)) {
+            unset($items[$validatedData['key']]);
+
+        } else {
+            return response()->json(['message' => 'Item not found'], 404);
+        }
+
+        $cart->items = json_encode($items);
+        $cart->save();
+    
+        return response()->json(['message' => 'Item deleted', 'items' => $items]);
+    
     }
 }
