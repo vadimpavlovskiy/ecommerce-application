@@ -30,6 +30,12 @@ class Product extends Model
         'custom_properties'
     ];
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+    
+
     
 
     protected static function boot()
