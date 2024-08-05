@@ -6,8 +6,12 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Illuminate\Support\Str;
+
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +29,12 @@ class CategoryResource extends Resource
         ->schema([
             Forms\Components\TextInput::make('name')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Set $set, $state) {
+                    $set('slug', Str::slug($state));
+                }),
+            TextInput::make('slug')->required()->maxLength(255),
             Forms\Components\Textarea::make('description'),
             Forms\Components\Select::make('products')
                 ->multiple()

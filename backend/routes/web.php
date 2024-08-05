@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CategoryController as ApiCategoryController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,9 +15,9 @@ Route::controller(ProductController::class)->group(function () {
     Route::get('/api/products/{id}', [ProductController::class, 'show']);
 });
 
-Route::controller(CategoryController::class)->group(function () {
-    Route::get('/api/categories', [CategoryController::class, 'index']);
-Route::get('/api/categories/{id}', [CategoryController::class, 'show']);
+Route::controller(ApiCategoryController::class)->group(function () {
+    Route::get('/api/categories', [ApiCategoryController::class, 'index']);
+    Route::get('/api/categories/{slug}', [ApiCategoryController::class, 'show']);
 });
 
 Route::controller(OrderController::class)->group(function () {

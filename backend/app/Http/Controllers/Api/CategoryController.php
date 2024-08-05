@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -35,9 +36,10 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($slug)
     {
-        return Category::with('products')->find($id);
+        $category = Category::with('products')->where('slug', $slug)->firstOrFail();
+        return response()->json($category);
 
     }
 
