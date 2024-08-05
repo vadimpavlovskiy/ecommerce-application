@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Banner } from "./layouts/Banner";
 import { Features } from "./layouts/Features";
 import { HeroSection } from "./layouts/HeroSection";
+import { AllCategories } from "./layouts/AllCategories";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
           }
         ]}
         />
+        <AllCategories />
       </div>
     </main>
   );

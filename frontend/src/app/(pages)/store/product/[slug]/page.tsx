@@ -1,4 +1,4 @@
-import { fetchProductById } from '@/app/api/productApi'
+import { fetchProductBySlug } from '@/app/api/productApi'
 import CartComponent from '@/app/components/CartComponent';
 import { Features } from '@/app/layouts/Features';
 import ProductDetails from '@/app/layouts/product/ProductDetails';
@@ -7,9 +7,9 @@ import React from 'react'
 export default async function Page({
     params: { slug },
   }: {
-    params: { slug: number }
+    params: { slug: string }
   }) {
-    const productData = await fetchProductById(slug);
+    const productData = await fetchProductBySlug(slug);
   return (
     <>
     <CartComponent />

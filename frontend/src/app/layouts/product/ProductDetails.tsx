@@ -27,7 +27,6 @@ const ProductDetails = ({productData}:{productData:any}) => {
         return savedCartId;
     });
 
-
     const handleFeatureChange = (feature:any) => {
         setAdditionalFeatures((prev:any) =>
           prev.includes(feature)
