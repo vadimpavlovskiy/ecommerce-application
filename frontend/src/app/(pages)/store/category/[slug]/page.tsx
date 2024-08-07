@@ -14,7 +14,6 @@ export default async function Page({
     params: { slug: string }
   }) {
     const data:Category = await fetchCategoriesBySlug(slug)
-    console.log(data);
   return (
     <>
     <CartComponent />

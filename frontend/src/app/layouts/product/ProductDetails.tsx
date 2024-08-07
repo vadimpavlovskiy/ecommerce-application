@@ -47,7 +47,11 @@ const ProductDetails = ({productData}:{productData:any}) => {
             quantity,
         };
         try {
-          const response = await axios.post('http://157.230.208.159/api/cart/add', orderData);
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/cart/add`, orderData, {
+            headers: {
+                Accept: 'application/json'
+            }
+          });
           dispatch({ type: 'ADD_ITEMS', payload: response.data.cart });
           console.log('Order submitted successfully:', response.data.cart);
 
