@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-    
+
+        $middleware->validateCsrfTokens(except: [
+            'api/*'
+        ]);
         $middleware->appendToGroup('web', [StartSession::class, EncryptCookies::class]);
         $middleware->prependToGroup('api',[StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
