@@ -12,7 +12,6 @@ Route::get('/', function () {
 
 Route::controller(ProductController::class)->group(function () {
     Route::get('/api/products', [ProductController::class, 'index']);
-    Route::get('/api/image', [ProductController::class, 'getImage']);
     Route::get('/api/products/{id}', [ProductController::class, 'show']);
 });
 

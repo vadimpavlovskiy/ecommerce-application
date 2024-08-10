@@ -4,6 +4,7 @@ import { Features } from '@/app/layouts/Features';
 import ProductDetails from '@/app/layouts/product/ProductDetails';
 import { Category, Product } from '@/app/types/layoutTypes/CategorySection';
 import { Raleway } from 'next/font/google';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect } from 'react'
 
@@ -19,23 +20,27 @@ export default async function Page({
     <CartComponent />
     <main className="mx-[150px] max-lg:mx-[20px]">
       {data.products.map((product:Product, index:number)=> {
+        console.log(data)
         return (
-          <Link href={`/store/product/${product.id}`}>
-            <div className={`${raleway.className} text-2xl flex`}>
+          <div className={`${raleway.className} text-2xl flex max-w-fit`}>
+              <Link href={`/store/product/${product.id}`}>
               <div className='flex flex-col items-center justify-center'>
-              <h4 className='font-semibold'>{product.name}</h4>
-              <div className='flex gap-x-5 font-light text-sm'>
-                  <span>L: {product.length}</span>
-                  <span>W: {product.width}</span>
-                  <span>H: {product.height}</span>
+              <Image className='rounded-2xl' src={product.image} alt='alt' width={250} height={200} />
+              <div>
+                <h4 className='font-semibold'>{product.name}</h4>
+                <div className='flex gap-x-5 font-light text-sm justify-center'>
+                  <span className='flex items-center'><Image src={'/length.svg'} width={10} height={10} className='mr-1' alt='Product length' />L: {product.length}</span>
+                  <span className='flex items-center'><Image src={'/width.svg'} alt='Product length' width={15} height={15} className='mr-1'/>W: {product.width}</span>
+                  <span className='flex items-center'><Image src={'/height.svg'} alt='Product length' width={10} height={10} className='mr-1'/>H: {product.height}</span>
+                </div>
+                <div className='text-[#252525] text-center'>
+                  <p className="line-through text-base">{product.price} $</p>
+                  <p className="text-2xl font-semibold">{product.discounted_price} $</p>
+                </div>
+                </div>
               </div>
-              <div className='text-[#252525] text-center'>
-                <p className="line-through text-base">{product.price} $</p>
-                <p className="text-2xl font-semibold">{product.discounted_price} $</p>
-              </div>
-              </div>
-            </div>
           </Link>
+            </div>
         )
       })}
     </main>

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
@@ -37,7 +38,14 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->required()->maxLength(255),
+                Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Set $set, $state) {
+                    $set('slug', Str::slug($state));
+                }),
+            TextInput::make('slug')->required()->maxLength(255),
                 RichEditor::make('description')->required()->maxLength(1200)->columnSpan('full'),
                 TextInput::make('sku')->required()->minLength(5)->maxLength(300)->required()->string(),
                 FileUpload::make('image')
@@ -111,7 +119,30 @@ class ProductResource extends Resource
                         ->schema(fn (Get $get): array => match ($get('dynamicTypeFields')) {
                             'color' => [
                                 TextInput::make('name')->required()->label('Color Name'),
-                                FileUpload::make('image')->required()->label('Color Image'),
+                                FileUpload::make('color_image')
+                                ->required()
+                                ->label('Color Image')
+                                ->required()
+                                ->disk('spaces')
+                                ->directory('colors')
+                                ->preserveFilenames()
+                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file) {
+                                    return $file->getClientOriginalName();
+                                })            
+                                ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
+                                    $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
+                                    $filename = $file->getClientOriginalName();
+                                    return $file->{$storeMethod}($component->getDirectory(), $filename, $component->getDiskName());
+                                })
+                                ->deleteUploadedFileUsing(function ($file) {
+                                    Storage::disk('spaces')->delete('products/'. $file);
+                                })
+                                ->imagePreviewHeight('250')
+                                ->imageCropAspectRatio('1:1')
+                                ->imageResizeTargetWidth('500')
+                                ->imageResizeTargetHeight('500')
+                                ->image()
+                                ->nullable(false),
                                 TextInput::make('price')->required()->label('Color Price')->numeric(),
                             ],
                             'characteristic' => [

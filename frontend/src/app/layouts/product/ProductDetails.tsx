@@ -71,7 +71,7 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
                             <div className='flex gap-x-5'>    
                                 <span className='flex items-center'><Image src={'/length.svg'} width={15} height={15} className='mr-1' alt='Product length' /> L: {productData.length}</span>
                                 <span className='flex items-center'><Image src={'/width.svg'} alt='Product length' width={15} height={15} className='mr-1'/>W: {productData.width}</span>
-                                <span className='flex items-center'><Image src={'/height.svg'} alt='Product length' width={10} height={10} className='mr-1'/>H: {productData.height}</span>
+                                <span className='flex items-center'><Image src={'/height.svg'} alt='Product length' width={1} height={1} className='mr-1'/>H: {productData.height}</span>
                             </div>
                             <div>
                                 <p>
