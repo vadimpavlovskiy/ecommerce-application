@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -15,13 +16,17 @@ class ProductController extends Controller
         return response()->json($products, $sessionData);
     }
 
-    public function show($id) {
-        $product = Product::find($id);
+    public function show($slug) {
+        $product = Product::where('slug', $slug)->first();
 
         if (!$product) {
             return response()->json(['message' => 'Product not found', 404]);
         };
+        $contents = Storage::url($product['image']);
 
-        return response()->json($product);
+        return response()->json([
+            "products" => $product,
+            "contents" => $contents
+        ]);
     }
 }

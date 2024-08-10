@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -13,8 +14,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::with('products')->get();
-
+        $categories = Category::with('products')->get();
+        return response()->json($categories);
     }
 
     /**
@@ -39,8 +40,14 @@ class CategoryController extends Controller
     public function show($slug)
     {
         $category = Category::with('products')->where('slug', $slug)->firstOrFail();
-        return response()->json($category);
 
+            $category->products->transform(function ($product) {
+                $product['image'] = Storage::url($product['image']);
+                return $product;
+            });
+            return $category;
+
+        return response()->json($categories);
     }
 
     /**

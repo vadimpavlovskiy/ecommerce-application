@@ -10,11 +10,12 @@ export default async function Page({
     params: { slug: string }
   }) {
     const productData = await fetchProductBySlug(slug);
+    console.log(productData)
   return (
     <>
     <CartComponent />
     <main className="mx-[150px] max-lg:mx-[20px]">
-            <ProductDetails productData={productData} />
+            <ProductDetails productData={productData.products} image={productData.contents} />
             <Features />
     </main>
     </>
