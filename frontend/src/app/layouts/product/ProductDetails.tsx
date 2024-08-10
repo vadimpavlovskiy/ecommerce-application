@@ -1,14 +1,14 @@
 'use client'
 import DOMPurify from 'isomorphic-dompurify'
 import Image from 'next/image';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Raleway } from 'next/font/google';
 import axios from 'axios';
 import { OrderData } from '@/app/types/componentTypes/CartComponent';
 import { useCart } from '@/app/context/CartProvider';
 const raleway = Raleway({subsets: ['latin'], weight: ['300', '400', '600']})
 
-const ProductDetails = ({productData}:{productData:any}) => {
+const ProductDetails = ({productData, image}:{productData:any, image:string}) => {
     const sanitizedThumbnail =  DOMPurify.sanitize(productData.thumbnail);
     const sanitizedDescription =  DOMPurify.sanitize(productData.description);
     const [selectedColor, setSelectedColor] = useState('');
@@ -17,6 +17,7 @@ const ProductDetails = ({productData}:{productData:any}) => {
     const [additionalFeatures, setAdditionalFeatures] = useState([]);
     const [quantity, setQuantity] = useState(1);  
     const { state: cartState, dispatch } = useCart();
+    console.log(image)
     const [cartId, setCartId] = useState(() => {
         // Generate or retrieve a cart ID
         let savedCartId = localStorage.getItem('cart_id');
@@ -59,13 +60,11 @@ const ProductDetails = ({productData}:{productData:any}) => {
           console.error('Error submitting order:', error);
         }
       };
-    
-    
     return (
         <div className={`${raleway.className} font-normal text-[1.25rem] w-full`}>
                     <div className='flex'>
                         <div className='relative w-[800px] h-[887px] flex-shrink-0 mr-5'>
-                        <Image src={'/sofa.png'} layout='fill' objectFit='cover' alt='heroSection' />
+                        <Image src={image} layout='fill' objectFit='cover' alt='heroSection' />
                         </div>
                         <div>
                             <h2 className={`${raleway.className} font-semibold text-[2.5rem]`}>{productData.name}</h2>

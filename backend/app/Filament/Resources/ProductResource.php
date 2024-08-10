@@ -24,6 +24,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductResource extends Resource
 {
@@ -38,7 +40,28 @@ class ProductResource extends Resource
                 TextInput::make('name')->required()->maxLength(255),
                 RichEditor::make('description')->required()->maxLength(1200)->columnSpan('full'),
                 TextInput::make('sku')->required()->minLength(5)->maxLength(300)->required()->string(),
-                FileUpload::make('image')->required(),
+                FileUpload::make('image')
+                ->required()
+                ->disk('spaces')
+                ->directory('products')
+                ->preserveFilenames()
+                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file) {
+                    return $file->getClientOriginalName();
+                })            
+                ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
+                    $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
+                    $filename = $file->getClientOriginalName();
+                    return $file->{$storeMethod}($component->getDirectory(), $filename, $component->getDiskName());
+                })
+                ->deleteUploadedFileUsing(function ($file) {
+                    Storage::disk('spaces')->delete('products/'. $file);
+                })
+                ->imagePreviewHeight('250')
+                ->imageCropAspectRatio('1:1')
+                ->imageResizeTargetWidth('500')
+                ->imageResizeTargetHeight('500')
+                ->image()
+                ->nullable(false),
                 RichEditor::make('thumbnail')->required()->maxLength(255)->columnSpan('full'),
                 Section::make('Properties')
                 ->description('Properties of product')

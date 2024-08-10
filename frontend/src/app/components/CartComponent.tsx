@@ -45,7 +45,6 @@ export default function CartComponent() {
   useEffect(() => {
     getCart();
   }, [])
-  
   return (
     <>
     <div className={`drawer z-50 join drawer-end ${raleway.className}`} >
@@ -54,7 +53,8 @@ export default function CartComponent() {
     <label htmlFor="my-drawer-4" className="drawer-button">
       <div className='m-5'>
         <div className="indicator cursor-pointer">
-          <span className="indicator-item indicator-bottom indicator-start badge badge-warning">                  {Object.keys(cartState.items).length}
+          <span className="indicator-item indicator-bottom indicator-start badge badge-warning">    
+            {Object.keys(cartState.items).length}
           </span>
           <div className="grid h-15 w-16d place-items-center">
             <Image width={30} height={36} src={'/cart.svg'} alt='' />
