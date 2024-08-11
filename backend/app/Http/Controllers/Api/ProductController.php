@@ -12,8 +12,7 @@ class ProductController extends Controller
 {
     public function index() {
         $products = Product::all();
-        $sessionData = Session::get()->all();
-        return response()->json($products, $sessionData);
+        return response()->json($products);
     }
 
     public function show($slug) {
