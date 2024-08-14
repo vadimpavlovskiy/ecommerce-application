@@ -15,6 +15,12 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with('products')->get();
+        foreach ($categories as $category) {
+            $category->products->transform(function ($product) {
+                $product['image'] = Storage::url($product['image']);
+                return $product;
+            });
+        }
         return response()->json($categories);
     }
 

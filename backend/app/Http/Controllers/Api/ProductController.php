@@ -12,6 +12,10 @@ class ProductController extends Controller
 {
     public function index() {
         $products = Product::all();
+        $products->transform(function ($product) {
+            $product['image'] = Storage::url($product['image']);
+            return $product;
+        });
         return response()->json($products);
     }
 
