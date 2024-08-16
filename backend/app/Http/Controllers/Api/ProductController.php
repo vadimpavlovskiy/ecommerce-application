@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     public function index() {
-        $products = Product::all();
+        $products = Product::paginate(2);
         $products->transform(function ($product) {
             $product['image'] = Storage::url($product['image']);
             return $product;
