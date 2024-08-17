@@ -16,6 +16,7 @@ export interface Pivot {
 export interface Product {
   id: number;
   name: string;
+  slug: string;
   description: string;
   sku: string;
   length: number;

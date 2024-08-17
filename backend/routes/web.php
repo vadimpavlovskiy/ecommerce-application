@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::controller(ProductController::class)->group(function () {
     Route::get('/api/products', [ProductController::class, 'index']);
+    Route::get('/api/products/search', [ProductController::class, 'search']);
     Route::get('/api/products/{id}', [ProductController::class, 'show']);
 });
 

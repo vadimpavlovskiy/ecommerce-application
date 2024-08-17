@@ -12,8 +12,11 @@ class ProductController extends Controller
 {
     public function index() {
         $products = Product::all();
-        $sessionData = Session::get()->all();
-        return response()->json($products, $sessionData);
+        $products->transform(function ($product) {
+            $product['image'] = Storage::url($product['image']);
+            return $product;
+        });
+        return response()->json($products);
     }
 
     public function show($slug) {
@@ -27,6 +30,26 @@ class ProductController extends Controller
         return response()->json([
             "products" => $product,
             "contents" => $contents
+        ]);
+    }
+    public function search (Request $request) {
+        $searchValue = $request->input('search');
+        $products = Product::when($searchValue, function ($q) use ($searchValue) {
+            return $q->where('name', 'like', "%{$searchValue}%");
+        })->get();
+    
+        $products->transform(function ($product) {
+            $product['image'] = Storage::url($product['image']);
+            return $product;
+        });
+
+        // $products->transform(function ($product) {
+        //     $product['image'] = Storage::url($product['image']);
+        // });
+
+        return response()->json([
+            "products" => $products,
+            'search' => $searchValue
         ]);
     }
 }
