@@ -17,7 +17,7 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
     const [additionalFeatures, setAdditionalFeatures] = useState([]);
     const [quantity, setQuantity] = useState(1);  
     const { state: cartState, dispatch } = useCart();
-    console.log(image)
+    (image)
     const [cartId, setCartId] = useState(() => {
         // Generate or retrieve a cart ID
         let savedCartId = localStorage.getItem('cart_id');
@@ -54,8 +54,6 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
             }
           });
           dispatch({ type: 'ADD_ITEMS', payload: response.data.cart });
-          console.log('Order submitted successfully:', response.data.cart);
-
         } catch (error) {
           console.error('Error submitting order:', error);
         }

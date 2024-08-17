@@ -13,7 +13,7 @@ export const Pagination = () => {
     const totalPages = Math.ceil(state.products.length / itemsPerPage);
 
     const renderPageNumbers = () => {
-      console.log('state length: ' + totalPages)
+      ('state length: ' + totalPages)
         const pages = [];
         for (let i = 1; i <= totalPages; i++) {
           if (i === 1 || i === totalPages || (i >= Number(page) - 1 && i <= Number(page) + 1)) {

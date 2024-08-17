@@ -11,16 +11,16 @@ const raleway = Raleway({subsets: ['latin'], weight: ['300', '400', '600']})
 export default function CartComponent() {
   const { state: cartState, dispatch } = useCart();
   const savedCartId = localStorage.getItem('cart_id');
-  console.log(cartState.items)
+  (cartState.items)
 
   async function updateCart(quantity: number, key:string) {
     try {
       const response = await axios.put(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/cart/update?cart_id=${savedCartId}&quantity=${Number(quantity)}&key=${key}`);
-      console.log(response.data.items)
+      (response.data.items)
       dispatch({ type: 'UPDATE_CART', payload: response.data.items });
 
     } catch (error) {
-      console.log(error);
+      (error);
     }
   }
   async function getCart() {
@@ -39,7 +39,7 @@ export default function CartComponent() {
       dispatch({ type: 'DELETE_ITEM', payload: key });
 
     } catch(error) {
-      console.log(error)
+      (error)
     }
   }
   useEffect(() => {

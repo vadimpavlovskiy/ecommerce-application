@@ -8,9 +8,9 @@ export const fetchProducts = async () => {
     );
     return response.data;
   } catch (error) {
-    console.log("====================================");
-    console.log("Error fetching problem", error);
-    console.log("====================================");
+    ("====================================");
+    "Error fetching problem", error;
+    ("====================================");
   }
 };
 export const fetchProductBySlug = async (slug: string) => {
@@ -20,9 +20,7 @@ export const fetchProductBySlug = async (slug: string) => {
     );
     return response.data;
   } catch (error) {
-    console.log("====================================");
-    console.log("Error fetching problem", error);
-    console.log("====================================");
+    console.log(error);
   }
 };
 

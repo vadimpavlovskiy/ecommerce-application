@@ -2,6 +2,7 @@ import { fetchCategories, fetchCategoriesBySlug } from '@/app/api/categoryApi';
 import CartComponent from '@/app/components/CartComponent';
 import { ProductCard } from '@/app/components/ProductCard';
 import { Features } from '@/app/layouts/Features';
+import { Breadcrumbs } from '@/app/layouts/breadcrumbs/Breadcrumbs';
 import { AsideSelectiveMenu } from '@/app/layouts/categories/AsideSelectiveMenu';
 import { AllProducts } from '@/app/layouts/product/AllProducts';
 import ProductDetails from '@/app/layouts/product/ProductDetails';
@@ -23,12 +24,13 @@ export default async function Page({
     <>
     <CartComponent />
     <main className="mx-[150px] max-lg:mx-[20px]">
+    <Breadcrumbs />
       <div className='flex gap-x-5'>
-      <AsideSelectiveMenu categories={categories} />
-      <div className='flex w-full'>
-        <h2 className='font-semibold text-2xl'>{data.name.toUpperCase()}</h2>
-        <AllProducts products={data.products} />
-          </div>
+        <AsideSelectiveMenu categories={categories} />
+        <div className='flex w-full'>
+          <h2 className='font-semibold text-2xl'>{data.name.toUpperCase()}</h2>
+          <AllProducts products={data.products} />
+        </div>
       </div>
     </main>
     </>

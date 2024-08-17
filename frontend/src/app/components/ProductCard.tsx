@@ -7,10 +7,10 @@ import Image from 'next/image'
 const raleway = Raleway({ subsets: ['latin'], weight: ['600', '300'] })
 
 export const ProductCard = ({product}:{product:Product}) => {
-  console.log(product)
+  (product)
   return (
     <div className={`${raleway.className} text-2xl flex max-w-fit`}>
-              <Link href={`${product.slug}`} className='flex flex-col items-center justify-center'>
+              <Link href={`/store/${product.slug}`} className='flex flex-col items-center justify-center'>
               <Image className='rounded-2xl' src={product.image} alt='alt' width={250} height={200} />
               <div>
                 <h4 className='font-semibold'>{product.name}</h4>
