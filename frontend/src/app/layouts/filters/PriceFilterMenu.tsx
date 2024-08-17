@@ -2,8 +2,8 @@
 import { useStore } from '@/app/context/StoreProvider';
 import React, { useState } from 'react'
 
-export const PriceFilterMenu = ({highestPrice}:{highestPrice:number}) => {
-  const [value, setValue] = useState(40);
+export const PriceFilterMenu = ({highestPrice, lowestPrice}:{highestPrice:number, lowestPrice:number}) => {
+  const [value, setValue] = useState(highestPrice);
   const {state, dispatch} = useStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,13 +21,13 @@ export const PriceFilterMenu = ({highestPrice}:{highestPrice:number}) => {
     <div className="collapse-title text-xl font-medium">Price</div>
     <div className="collapse-content">
       <div className="flex justify-between text-xs mb-2">
-        <span>$0</span>
+        <span>${lowestPrice}</span>
         <span>${value}</span>
         <span>${highestPrice}</span>
       </div>
       <input       
         type="range"
-        min={0}
+        min={lowestPrice}
         max={highestPrice}
         value={value}
         onChange={handleChange}

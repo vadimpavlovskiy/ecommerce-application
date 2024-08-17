@@ -1,43 +1,37 @@
-'use client'
-import { fetchCategories } from '@/app/api/categoryApi';
-import { fetchAllProducts } from '@/app/api/storeApi';
-import { ProductCard } from '@/app/components/ProductCard';
+'use client';
+import React, { FC, useEffect } from 'react';
 import { useStore } from '@/app/context/StoreProvider';
 import { Product } from '@/app/types/layoutTypes/CategorySection';
-import React, { FC, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation';
+import { ProductCard } from '@/app/components/ProductCard';
 
+export const AllProducts: FC<{ products: Product[] }> = ({ products }) => {
+  const { state, dispatch } = useStore();
+  const searchParams = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1');
+  const itemsPerPage = 3; // Change this number based on how many items per page you want
 
-interface AllProductsProps {
-    products: Product[];
-  }
-  
+  useEffect(() => {
+    dispatch({ type: 'SET_PRODUCTS', payload: products });
+  }, [products, dispatch]);
 
-export const AllProducts:FC<AllProductsProps> = ({products}:{products:Product[]}) => {
-    const { state, dispatch } = useStore();
+  const startIndex = (page - 1) * itemsPerPage;
+  const paginatedProducts = state.products.slice(startIndex, startIndex + itemsPerPage);
 
-    useEffect(() => {
-        dispatch({ type: 'SET_PRODUCTS', payload: products });
-      }, [products, dispatch]);
-      const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        dispatch({ type: 'SET_SORT', payload: e.target.value as 'none' | 'low-to-high' | 'high-to-low' });
-      };
-    
   return (
-    <div className='w-full'>
-        <div className='py-10 flex justify-end'>
-            <select onChange={handleSortChange}>
-                <option value="none">No Sorting</option>
-                <option value="low-to-high">Price: Low to High</option>
-                <option value="high-to-low">Price: High to Low</option>
-            </select>
-        </div>
-        <div className='flex gap-[2.188rem]'>
-        {state.products.map((product:Product, index) => {
-            return (
-                <ProductCard product={product} />
-                )
-                })}
-        </div>
+    <div className="w-full">
+      <div className="py-10 flex justify-end">
+        <select onChange={(e) => dispatch({ type: 'SET_SORT', payload: e.target.value as 'none' | 'low-to-high' | 'high-to-low' })}>
+          <option value="none">No Sorting</option>
+          <option value="low-to-high">Price: Low to High</option>
+          <option value="high-to-low">Price: High to Low</option>
+        </select>
+      </div>
+      <div className="flex gap-[2.188rem]">
+        {paginatedProducts.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
     </div>
-  )
-}
+  );
+};

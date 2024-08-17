@@ -9,6 +9,7 @@ interface StoreState {
   categories: Category[];
   selectedCategory: Category[] | null;
   sortType: 'none' | 'low-to-high' | 'high-to-low';
+  
 }
 
 const initialState: StoreState = {
@@ -21,6 +22,7 @@ const initialState: StoreState = {
 
 type StoreAction =
   | { type: 'SET_PRODUCTS'; payload: Product[] }
+  | { type: 'SET_PAGINATED_PRODUCTS'; payload: Product[] }
   | { type: 'SET_CATEGORIES'; payload: Category[] }
   | { type: 'SET_CATEGORY'; payload: number | null }
   | { type: 'SET_SORT'; payload: 'none' | 'low-to-high' | 'high-to-low' }
@@ -35,6 +37,11 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
         ...state,
         products: action.payload,
         originalProducts: action.payload
+      };
+    case 'SET_PAGINATED_PRODUCTS':
+      return {
+        ...state,
+        products: action.payload
       };
     case 'SET_CATEGORY':
         const sortedCategory = state.categories.filter((category, index) => category.id === action.payload);
@@ -51,7 +58,7 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
         categories: action.payload,
       };
     case 'SET_SORT':
-      const sortedProducts = [...state.products];
+      const sortedProducts = [...state.originalProducts];
       if (action.payload === 'low-to-high') {
         sortedProducts.sort((a, b) => a.price - b.price);
       } else if (action.payload === 'high-to-low') {
@@ -59,10 +66,10 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
       } else if (action.payload === 'none') {
         sortedProducts.sort((a, b) => Number(a.id) - Number(b.id));
       }
+    
       return {
         ...state,
         products: sortedProducts,
-        sortType: action.payload,
       };
     case 'SET_PRICE_FILTER':
       const sortedPriceProducts:Product[] = state.originalProducts.filter((product, index) => {
@@ -70,6 +77,12 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
           return product.discounted_price <= action.payload
         }
       })
+      console.dir(
+        {
+          "original": state.originalProducts,
+          "sorted": sortedPriceProducts, 
+          "action": action.payload}
+      )
         return {
           ...state,
           products: sortedPriceProducts

@@ -1,5 +1,5 @@
 import { fetchCategories } from '@/app/api/categoryApi';
-import { fetchAllProducts } from '@/app/api/storeApi';
+import { fetchAllProducts, searchProduct } from '@/app/api/storeApi';
 import CartComponent from '@/app/components/CartComponent';
 import { Pagination } from '@/app/components/Pagination';
 import { AsideSelectiveMenu } from '@/app/layouts/categories/AsideSelectiveMenu';
@@ -7,9 +7,10 @@ import { AllProducts } from '@/app/layouts/product/AllProducts';
 import { useParams, usePathname } from 'next/navigation';
 import React from 'react'
 
-const Page = async ({searchParams}:{searchParams:{page?: number}}) => {
+const Page = async ({searchParams}:{searchParams:{page?: number, search: string}}) => {
   const currentPage:number = searchParams.page || 1;
-  const { data, current_page, last_page } = await fetchAllProducts({page:currentPage});
+  const search = searchParams.search || '';
+  const data = !search ? await fetchAllProducts() : await searchProduct({page: currentPage, searchValue: search});
   const categories = await fetchCategories();
   return (
     <>
@@ -22,7 +23,7 @@ const Page = async ({searchParams}:{searchParams:{page?: number}}) => {
             <AllProducts products={data} />
           </div>
         </div>
-        <Pagination currentPage={current_page} lastPage={last_page} />
+        <Pagination />
       </main>
     </>
   );

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react'
 import { PriceFilterMenu } from '../filters/PriceFilterMenu';
+import { SearchComponent } from '@/app/components/SearchComponent';
 
 const raleway = Raleway({ subsets: ['latin'], weight: ['400','600'] })
 export const AsideSelectiveMenu = ({categories}:{categories:Category[]}) => {
@@ -18,10 +19,17 @@ export const AsideSelectiveMenu = ({categories}:{categories:Category[]}) => {
       return product.price > max ? product.price : max;
     }
   }, 0);
+
+  const lowestPrice = state.originalProducts.reduce((min: number, product: Product) => {
+    const price = product.discounted_price || product.price;
+    return price < min ? price : min;
+  }, Infinity);
+  
   
   const pathname = usePathname()
   return (
     <div className="flex flex-col gap-y-2">
+      <SearchComponent />
       <div className={`${raleway.className} text-base font-normal border border-gray-200 rounded-xl py-5`}>
             <ul>
               <li 
@@ -41,7 +49,7 @@ export const AsideSelectiveMenu = ({categories}:{categories:Category[]}) => {
                 })}
             </ul>
       </div>
-      <PriceFilterMenu highestPrice={highestPrice} />
+      <PriceFilterMenu lowestPrice={lowestPrice} highestPrice={highestPrice} />
     </div>
   )
 }
