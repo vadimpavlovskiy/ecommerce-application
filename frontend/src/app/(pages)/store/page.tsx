@@ -2,6 +2,7 @@ import { fetchCategories } from '@/app/api/categoryApi';
 import { fetchAllProducts, searchProduct } from '@/app/api/storeApi';
 import CartComponent from '@/app/components/CartComponent';
 import { Pagination } from '@/app/components/Pagination';
+import { Breadcrumbs } from '@/app/layouts/breadcrumbs/Breadcrumbs';
 import { AsideSelectiveMenu } from '@/app/layouts/categories/AsideSelectiveMenu';
 import { AllProducts } from '@/app/layouts/product/AllProducts';
 import { useParams, usePathname } from 'next/navigation';
@@ -16,6 +17,7 @@ const Page = async ({searchParams}:{searchParams:{page?: number, search: string}
     <>
       <CartComponent />
       <main className="mx-[150px] max-lg:mx-[20px] flex flex-col">
+      <Breadcrumbs />
         <div className="flex gap-x-5">
           <AsideSelectiveMenu categories={categories} />
           <div className="flex w-full">

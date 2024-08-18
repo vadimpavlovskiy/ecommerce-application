@@ -7,9 +7,7 @@ export const fetchCategories = async () => {
     );
     return response.data;
   } catch (error) {
-    console.log("====================================");
     console.log("Error fetching problem", error);
-    console.log("====================================");
   }
 };
 
@@ -20,8 +18,6 @@ export const fetchCategoriesBySlug = async (slug: string) => {
     );
     return response.data;
   } catch (error) {
-    console.log("====================================");
     console.log("Error fetching problem", error);
-    console.log("====================================");
   }
 };

@@ -12,7 +12,7 @@ const raleway = Raleway({ subsets: ['latin'] })
 
 export const HeroSection = ({imageSrc, heading, desc, stats}: HeroSectionProps) => {
   useEffect(() => {
-    console.log(fetchProducts());
+    (fetchProducts());
   }, [])
   
     return (
