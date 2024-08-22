@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CartController extends Controller
 {
@@ -72,11 +73,16 @@ class CartController extends Controller
         $cart->items = json_encode($items);
         $cart->save();
 
+        $cartItems = collect($items)->map(function ($product) {
+            $product['image'] = Storage::url($product['image']);
+            return $product;
+        })->toArray();
+    
 
         return response()->json([
             'message' => 'Product added to cart successfully',
-            'cart' => json_decode($cart->items),
-            'total_price' => $items[$productKey]
+            'cart' => $cartItems,
+            'total_price' => $cartItems[$productKey]
         ], 201);
 
 
@@ -90,6 +96,13 @@ class CartController extends Controller
 
         $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
 
+        $items = json_decode($cart->items, true); // Decode as an associative array
+        $items = collect($items)->map(function ($product) {
+            $product['image'] = Storage::url($product['image']);
+            return $product;
+        })->toArray();
+
+        $cart->items = json_encode($items);
         return response()->json(json_decode($cart->items));
 
     }
@@ -132,11 +145,16 @@ class CartController extends Controller
         } else {
             return response()->json(['message' => 'Item not found'], 404);
         }
-    
+        
         // Encode the items back to JSON and save
         $cart->items = json_encode($items);
         $cart->save();
-    
+
+        $items = collect($items)->map(function ($item) {
+            $item['image'] = Storage::url($item['image']);
+            return $item;
+        })->toArray();    
+
         return response()->json(['message' => 'Updated', 'items'=> $items, 'total'=>$totalPrice]);
     }
 

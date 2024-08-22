@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController as ApiCategoryController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,4 +32,5 @@ Route::controller(CartController::class)->group(function () {
     Route::delete('/api/cart/delete', [CartController::class, 'delete']);
     Route::get('/api/cart', [CartController::class, 'show']);
 });
+Route::post('/api/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
 

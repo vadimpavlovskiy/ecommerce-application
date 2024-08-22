@@ -7,7 +7,7 @@ export const Breadcrumbs = () => {
     const paths = usePathname();
     const pathNames = paths.split('/').filter(path => path)
     return (
-        <div className='my-5'>
+        <div className='my-5 breadcrumbs'>
             <ul className='flex gap-x-2 items-center'>
                 {pathNames.map((url, index) => {
                     const href = `/${pathNames.slice(0, index + 1).join('/')}`
@@ -16,7 +16,6 @@ export const Breadcrumbs = () => {
                         <>
                             <li key={index} className={`text-sm space-x-2 ${paths === href ? 'font-bold' : ''}`}>
                                 <Link href={href}>{formattedUrl.toUpperCase()}</Link>
-                                {index !== pathNames.length-1 ? <span>/</span> : ''}
                             </li>
                         </>
                     )

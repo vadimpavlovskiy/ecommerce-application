@@ -9,7 +9,7 @@ export const fetchProducts = async () => {
     return response.data;
   } catch (error) {
     ("====================================");
-    "Error fetching problem", error;
+    console.log("Error fetching problem", error);
     ("====================================");
   }
 };
