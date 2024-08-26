@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController as ApiCategoryController;
+use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,12 +27,19 @@ Route::controller(ApiCategoryController::class)->group(function () {
 Route::controller(OrderController::class)->group(function () {
     Route::post('/api/orders', [OrderController::class, 'store']);
 });
+Route::controller(CheckoutController::class)->group(function () {
+    Route::post('/api/checkout/validate', [CheckoutController::class, 'validate']);
+    Route::post('/api/checkout/', [CheckoutController::class, 'add']);
+});
 
 Route::controller(CartController::class)->group(function () {
     Route::post('/api/cart/add', [CartController::class, 'add']);
     Route::put('/api/cart/update', [CartController::class, 'update']);
     Route::delete('/api/cart/delete', [CartController::class, 'delete']);
+    Route::delete('/api/cart/destroy', [CartController::class, 'destroy']);
     Route::get('/api/cart', [CartController::class, 'show']);
 });
+
 Route::post('/api/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
+Route::put('/api/update-payment-intent', [PaymentController::class, 'updatePaymentIntent']);
 

@@ -179,4 +179,13 @@ class CartController extends Controller
         return response()->json(['message' => 'Item deleted', 'items' => $items]);
     
     }
+
+    public function destroy ( Request $request) {
+        $validatedData = $request->validate([
+            'cart_id' => 'required | string'
+        ]);
+        Cart::where('cart_id', $validatedData['cart_id'])->delete();
+
+        return response()->json(['message' => 'Cart deleted', 'items' => []]);
+    }
 }
