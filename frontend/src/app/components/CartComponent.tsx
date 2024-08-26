@@ -4,6 +4,7 @@ import { Raleway } from 'next/font/google';
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { useCart } from '../context/CartProvider';
+import Link from 'next/link';
 
 const raleway = Raleway({subsets: ['latin'], weight: ['300', '400', '600']})
 
@@ -11,7 +12,6 @@ const raleway = Raleway({subsets: ['latin'], weight: ['300', '400', '600']})
 export default function CartComponent() {
   const { state: cartState, dispatch } = useCart();
   const savedCartId = localStorage.getItem('cart_id');
-  (cartState.items)
 
   async function updateCart(quantity: number, key:string) {
     try {
@@ -74,7 +74,8 @@ export default function CartComponent() {
           return (
                   <div className='flex justify-between p-5 items-center' key={index}>
                     <div className='flex flex-col gap-y-5'>
-                      <h3>{item.name}</h3>
+                      <h3 className='text-xl font-semibold'>{item.name}</h3>
+                      <Image src={`${item.image}`} alt={item.name} width={200} height={200} />
                       <div className='flex flex-col text-xs'>
                         <ul className='flex flex-col italic gap-x-1'>
                           {item.color ? <li className='font-bold'>Color: {item.color}</li> :''}
@@ -104,6 +105,7 @@ export default function CartComponent() {
               )}
 
       </div>
+      <Link className='min-w-full' href={'/checkout/'}><button className="btn btn-info text-white className='min-w-full'">Go to checkout</button></Link>
     </div>
   </div>
 </div>

@@ -8,6 +8,7 @@ interface CartItem {
   color?: string;
   textile?: string;
   matress?: string;
+  image: string;
   additionalFeatures?: string[];
   totalPrice: number;
   quantity: number;
