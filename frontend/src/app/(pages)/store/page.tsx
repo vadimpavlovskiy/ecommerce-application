@@ -18,9 +18,9 @@ const Page = async ({searchParams}:{searchParams:{page?: number, search: string}
       <CartComponent />
       <main className="mx-[150px] max-lg:mx-[20px] flex flex-col">
       <Breadcrumbs />
-        <div className="flex gap-x-5">
+        <div className="flex gap-x-5 max-md:flex-col">
           <AsideSelectiveMenu categories={categories} />
-          <div className="flex w-full">
+          <div className="flex w-full max-md:flex-col max-md:text-center max-md:mt-2">
             <h2 className="font-semibold text-2xl">All Products</h2>
             <AllProducts products={data} />
           </div>

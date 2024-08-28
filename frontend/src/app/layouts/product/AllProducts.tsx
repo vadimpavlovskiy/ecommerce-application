@@ -20,14 +20,14 @@ export const AllProducts: FC<{ products: Product[] }> = ({ products }) => {
 
   return (
     <div className="w-full">
-      <div className="py-10 flex justify-end">
-        <select onChange={(e) => dispatch({ type: 'SET_SORT', payload: e.target.value as 'none' | 'low-to-high' | 'high-to-low' })}>
+      <div className="py-10 flex justify-end max-md:py-2">
+        <select className='max-md:hidden' onChange={(e) => dispatch({ type: 'SET_SORT', payload: e.target.value as 'none' | 'low-to-high' | 'high-to-low' })}>
           <option value="none">No Sorting</option>
           <option value="low-to-high">Price: Low to High</option>
           <option value="high-to-low">Price: High to Low</option>
         </select>
       </div>
-      <div className="flex gap-[2.188rem]">
+      <div className="flex gap-[2.188rem] max-md:flex-col">
         {paginatedProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

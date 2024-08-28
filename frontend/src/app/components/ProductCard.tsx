@@ -9,8 +9,8 @@ const raleway = Raleway({ subsets: ['latin'], weight: ['600', '300'] })
 export const ProductCard = ({product}:{product:Product}) => {
   (product)
   return (
-    <div className={`${raleway.className} text-2xl flex max-w-fit`}>
-              <Link href={`/store/${product.slug}`} className='flex flex-col items-center justify-center'>
+    <div className={`${raleway.className} text-2xl flex max-w-fit max-md:max-w-full`}>
+              <Link href={`/store/${product.slug}`} className='flex flex-col items-center justify-center max-md:w-full max-md:text-center'>
               <Image className='rounded-2xl' src={product.image} alt='alt' width={250} height={200} />
               <div>
                 <h4 className='font-semibold'>{product.name}</h4>

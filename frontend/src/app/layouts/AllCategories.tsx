@@ -17,13 +17,13 @@ export const AllCategories = () => {
     }, [])
     
   return (
-    <div className='flex flex-col mt-[9.375rem]'>
-        <h2 className={`text-center text-[3.75rem] ${nunito.className} mb-[2.5rem]`}>Categories</h2>
-        <div className='grid grid-cols-3 gap-5'>
+    <div className='flex flex-col mt-[9.375rem] max-lg:mt-[6.25rem]'>
+        <h2 className={`text-center text-[3.75rem] ${nunito.className} mb-[2.5rem] max-lg:text-left max-lg:text-2xl`}>Categories</h2>
+        <div className='grid grid-cols-3 gap-5 max-lg:flex max-lg:flex-col'>
         {categories.map((category:Category, index:number) => {
             return (
                 <Link href={`/store/category/${category.slug}`}>
-                    <div key={category.id} className={`bg-[#C6DDFD] h-[13.438rem] flex flex-col justify-center items-center rounded-xl text-[1.875rem] ${raleway.className}`}>
+                    <div key={category.id} className={`bg-[#C6DDFD] h-[13.438rem] flex flex-col justify-center items-center rounded-xl text-[1.875rem] ${raleway.className} max-lg:text-base max-lg:h-[8.125rem]`}>
                         <span>
                             {category.name}
                         </span>

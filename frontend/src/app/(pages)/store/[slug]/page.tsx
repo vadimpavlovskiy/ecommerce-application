@@ -14,9 +14,9 @@ export default async function Page({
     (productData)
   return (
     <>
-    <CartComponent />
-    <Breadcrumbs />
     <main className="mx-[150px] max-lg:mx-[20px]">
+            <CartComponent />
+            <Breadcrumbs />
             <ProductDetails productData={productData.products} image={productData.contents} />
             <Features />
     </main>

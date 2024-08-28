@@ -65,47 +65,51 @@ export default function CartComponent() {
   </div>
   <div className="drawer-side ">
     <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
-    <div className="menu bg-base-200 text-base-content min-h-full w-1/3 p-4">
+    <div className="menu bg-base-200 text-base-content min-h-full w-1/3 p-4 max-md:w-3/4">
       <h2 className='text-[1.875rem] font-semibold'>Your cart: {Object.keys(cartState.items).length} products</h2>
       <div className="divider" />
       <div className="flex flex-col gap-y-7">
       {cartState.items ? (
         Object.entries(cartState.items).map(([key, item], index) => {
           return (
-                  <div className='flex justify-between p-5 items-center' key={index}>
-                    <div className='flex flex-col gap-y-5'>
-                      <h3 className='text-xl font-semibold'>{item.name}</h3>
-                      <Image src={`${item.image}`} alt={item.name} width={200} height={200} />
-                      <div className='flex flex-col text-xs'>
-                        <ul className='flex flex-col italic gap-x-1'>
-                          {item.color ? <li className='font-bold'>Color: {item.color}</li> :''}
-                          {item.textile ? <li className='font-bold'>Textile: {item.textile}</li> :''}
-                          {item.matress ? <li className='font-bold'>Matress: {item.matress}</li> :''}
-                          {item.additionalFeatures ? item.additionalFeatures.map((feature, index) => (
-                            <li className='font-bold' key={index}>Additional feature: {feature}</li>
-                          )) : ''}
-                        </ul>
+                  <div className='flex justify-between p-5 items-center max-lg:flex-col' key={index}>
+                    <div className='flex gap-y-5 border-b py-4 items-center max-lg:items-center max-lg:flex-col'>
+                      <div className='space-y-2 mr-5'>
+                        <h3 className='text-xl font-semibold max-lg:text-center'>{item.name}</h3>
+                        <Image src={`${item.image}`} alt={item.name} width={200} height={200} />
                       </div>
-                      <p className='text-[1.563rem] font-semibold'>{item.totalPrice} $</p>
-                    </div>
-                    <div className='flex space-x-5'>
-                    <div className="join flex items-center w-[7.313rem] justify-around divide-x bg-gray-300 rounded-full text-center">
+                      <div className='flex flex-col text-xs justify-between space-y-4 max-lg:space-x-4 max-lg:flex-row'>
+                        <div className='border-b max-lg:border-0'>
+                          <h4 className='text-xl font-semibold'>Properties:</h4>
+                          <ul className='flex flex-col italic gap-x-1 pb-4 space-y-1 max-lg:border-r max-lg:border-gray-600 max-lg:pr-4'>
+                            {item.color ? <li className='font-bold'>Color: {item.color}</li> :''}
+                            {item.textile ? <li className='font-bold'>Textile: {item.textile}</li> :''}
+                            {item.matress ? <li className='font-bold'>Matress: {item.matress}</li> :''}
+                            {item.additionalFeatures ? item.additionalFeatures.map((feature, index) => (
+                              <li className='font-bold' key={index}>Additional feature: {feature}</li>
+                            )) : ''}
+                          </ul>
+                        </div>
+                        <div className='flex space-x-5 max-lg:my-5 max-lg:flex-row-reverse max-lg:items-center max-lg:gap-x-4'>
+                          <div className="join flex items-center w-[7.313rem] justify-around divide-x bg-gray-300 rounded-full text-center ">
                                         <button onClick={()=>updateCart(item.quantity - 1, key)} className='p-3'>{'<'}</button>
                                         <span className='p-3 pl-4'>{item.quantity}</span>
                                         <button onClick={()=>updateCart(item.quantity + 1, key)} className='p-3'>{'>'}</button>
                                     </div>
-                      <div onClick={()=>deleteItem(key)}>
-                        <Image className='cursor-pointer' src={'/bin.svg'} alt='' width={30} height={30} />
-                      </div>                                                 
+                          <div onClick={()=>deleteItem(key)}>
+                            <Image className='cursor-pointer' src={'/bin.svg'} alt='' width={30} height={30} />
+                          </div>                                                 
+                    </div>
+                      </div>
+                      <p className='text-[1.563rem] font-semibold '>{item.totalPrice} $</p>
                     </div>
                   </div>
                 )})
               ) : (
                 <li><a>No items in cart</a></li>
               )}
-
       </div>
-      <Link className='min-w-full' href={'/checkout/'}><button className="btn btn-info text-white className='min-w-full'">Go to checkout</button></Link>
+      <Link className='w-full' href={'/checkout/'}><button className="btn btn-info btn-block text-white className='min-w-full'">Go to checkout</button></Link>
     </div>
   </div>
 </div>

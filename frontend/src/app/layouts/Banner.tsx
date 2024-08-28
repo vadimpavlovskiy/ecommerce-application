@@ -7,7 +7,7 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['900'] })
 export const Banner = () => {
   return (
     <div className='flex flex-col'>
-        <h1 className={`text-center font-sans text-9xl uppercase font-bold max-md:text-[35px] ${nunito.className}`}>
+        <h1 className={`text-center font-sans text-9xl uppercase font-bold max-md:text-[35px] ${nunito.className} max-lg:text-2xl`}>
             <span className='mb-5'>Soft furniture</span>
             <br />
             <span className='text-8xl max-md:text-[35px]'>made in US</span>

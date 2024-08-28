@@ -60,11 +60,11 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
       };
     return (
         <div className={`${raleway.className} font-normal text-[1.25rem] w-full`}>
-                    <div className='flex'>
-                        <div className='relative w-[800px] h-[887px] flex-shrink-0 mr-5'>
-                        <Image src={image} layout='fill' objectFit='cover' alt='heroSection' />
+                    <div className='flex max-xl:flex-col'>
+                        <div className='relative w-[600px] h-[687px] flex-shrink-0 mr-5 max-xl:h-[443px] max-xl:max-w-full'>
+                            <Image src={image} layout='fill' objectFit='cover' alt='heroSection' />
                         </div>
-                        <div>
+                        <div className=''>
                             <h2 className={`${raleway.className} font-semibold text-[2.5rem]`}>{productData.name}</h2>
                             <div className='flex gap-x-5'>    
                                 <span className='flex items-center'><Image src={'/length.svg'} width={15} height={15} className='mr-1' alt='Product length' /> L: {productData.length}</span>
@@ -86,8 +86,8 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
                                         {productData.discounted_price} $
                                     </p>
                                 </div>
-                                <div className='flex justify-between w-full gap-x-4 items-center p-5 border rounded-xl'>
-                                <label className="form-control w-1/2 max-w-xs flex flex-row justify-between gap-x-5">
+                                <div className='flex justify-between w-full gap-x-4 items-center p-5 border rounded-xl max-xl:flex-col max-xl:items-center max-xl:gap-y-4'>
+                                <label className="form-control w-3/4 max-w-xs flex flex-row justify-between gap-x-5">
                                     <div className="label">
                                         <span className="label-text text-[1.563rem]">Color: </span>
                                     </div>
@@ -104,7 +104,7 @@ const ProductDetails = ({productData, image}:{productData:any, image:string}) =>
                                         }
                                     </select>
                                     </label>
-                                    <label className="form-control w-1/2 max-w-xs flex flex-row justify-between gap-x-5">
+                                    <label className="form-control w-3/4 max-w-xs flex flex-row justify-between gap-x-5">
                                     <div className="label">
                                         <span className="label-text text-[1.563rem]">Textile: </span>
                                     </div>

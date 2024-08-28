@@ -43,7 +43,7 @@ export const CartLayout = () => {
   }, [])
     return (
         <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table max-sm:table-xs	max-md:table-md	max-lg:table-lg	">
         {/* head */}
         <thead>
             <tr>
@@ -53,24 +53,26 @@ export const CartLayout = () => {
             <th>Total</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody >
             {cartState.items ? (
         Object.entries(cartState.items).map(([key, item], index) => {
             return (
                 <tr>
-                        <th className='flex justify-between'>
+                        <th className='flex min-h-full space-x-6'>
                             <Image onClick={()=>deleteItem(key)} className='cursor-pointer' src={'/bin.svg'} alt='' width={30} height={30} />
-                            <Image className='rounded-lg' src={item.image} width={152} height={152} alt={'Item description'} />
+                              <div className='rounded-xl'>
+                                <Image className='rounded-xl max-md:hidden' src={item.image} width={152} height={152} alt={'Item description'} />
+                              </div>
                         </th> 
-            <td>
-                <p>{item.name}</p>
-                <div className="join flex items-center w-[7.313rem] justify-around divide-x bg-gray-300 rounded-full text-center">
+            <td className='space-y-4'>
+                <p className=''>{item.name}</p>
+                <div className="join flex items-center  w-[7.313rem] justify-around divide-x bg-gray-300 rounded-full text-center">
                     <button onClick={()=>updateCart(item.quantity - 1, key)} className='p-3'>{'<'}</button>
                     <span className='p-3 pl-4'>{item.quantity}</span>
                     <button onClick={()=>updateCart(item.quantity + 1, key)} className='p-3'>{'>'}</button>
                 </div>
             </td>
-            <td>
+            <td className=''>
                     {item.color ? <li className='font-bold'>Color: {item.color}</li> :''}
                     {item.textile ? <li className='font-bold'>Textile: {item.textile}</li> :''}
                     {item.matress ? <li className='font-bold'>Matress: {item.matress}</li> :''}
