@@ -101,7 +101,6 @@ class CartController extends Controller
             $product['image'] = Storage::url($product['image']);
             return $product;
         })->toArray();
-
         $cart->items = json_encode($items);
         return response()->json(json_decode($cart->items));
 

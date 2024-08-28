@@ -8,14 +8,55 @@ import { DeliveryForm } from './DeliveryForm';
 
 import { useConfirmAddress } from '@mapbox/search-js-react';
 import { IDeliveryForm } from '@/app/types/formTypes/deliveryForm';
+import axios from 'axios';
+import Stripe from 'stripe';
+import { Router } from 'next/router';
+import { useRouter } from 'next/navigation';
+import { fetchClientSecret, updateClientSecret } from '@/app/api/stripeApi';
 
 const stripePromise = loadStripe(String(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY));
-
-const CheckoutForm = ({ clientSecret, totalAmount }: { clientSecret: string, totalAmount:number }) => {
+const CheckoutForm = ({ clientSecret, stripeId, totalAmount, formData }: { clientSecret: string, stripeId:string, totalAmount:number, formData:IDeliveryForm }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter()
+
   const [error, setError] = useState<StripeError | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [message, setMessage] = useState<string | null >(null);
+  const {state: cartState, dispatch} = useCart();
+  const savedCartId = localStorage.getItem('cart_id');
+
+  useEffect(() => {
+    if (!stripe) {
+      return;
+    }
+
+    const clientSecret = new URLSearchParams(window.location.search).get(
+      "payment_intent_client_secret"
+    );
+
+    if (!clientSecret) {
+      return;
+    }
+
+    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+      switch (paymentIntent.status) {
+        case "succeeded":
+          setMessage("Payment succeeded!");
+          break;
+        case "processing":
+          setMessage("Your payment is processing.");
+          break;
+        case "requires_payment_method":
+          setMessage("Your payment was not successful, please try again.");
+          break;
+        default:
+          setMessage("Something went wrong.");
+          break;
+      }
+    });
+  }, [stripe]);
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -23,21 +64,75 @@ const CheckoutForm = ({ clientSecret, totalAmount }: { clientSecret: string, tot
     if (!stripe || !elements) return;
 
     setIsProcessing(true);
+    // Add error handling later
+    const checkoutData = {
+        full_name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: 'http://localhost:3000',
-      },
+        address: formData.address ? formData.address : null,
+        apartment: formData.addressLine2 ? formData.addressLine2 : null,
+        city: formData.city ? formData.city : null,
+        postal_code: formData.postalCode ? formData.postalCode : null,
+        comment: formData.comment ? formData.comment : null,
 
-    });
+        items: JSON.stringify(cartState.items),
+        total_amount: totalAmount,
 
-    if (error) {
-      console.error(error);
-      setError(error);
+        id: stripeId
     }
-
-    setIsProcessing(false);
+    
+    try {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/checkout/validate`, checkoutData, {
+            headers: {
+                Accept: 'application/json'
+            }
+        })
+        if(res) {
+          const checkout = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              return_url: 'http://localhost:3000',
+              receipt_email: formData.email ? formData.email : undefined,
+              shipping: {
+                address: {
+                  city: formData.city ? formData.city : undefined,
+                  line1: String(formData.address),
+                  line2: String(formData.addressLine2),
+                  postal_code: String(formData.postalCode)
+                },
+                name: String(formData.name),
+                phone: String(formData.phone)
+              }
+            },
+            redirect: 'if_required'
+          }).then(async function (result) {
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/checkout`, checkoutData, {
+              headers: {
+                Accept: 'application/json'
+              }
+              })
+              if(res.status === 200) { 
+                const res = await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/cart/destroy/?cart_id=${savedCartId}`);
+                dispatch({type: 'SET_CART', payload: res.data.items})
+                console.log(res.data.items)
+                router.replace('/');
+              }
+          }          
+          );
+          console.log(res)
+          dispatch({type: 'SET_CART', payload: res.data.items})
+        }
+        if (error) {
+          console.error(error); 
+          setError(error);
+        }
+    
+        setIsProcessing(false);
+        console.log(res);
+    } catch (error) {
+        console.error('Error submitting order:', error);
+    }
   };
 
   const paymentElementOptions = {
@@ -53,6 +148,7 @@ const CheckoutForm = ({ clientSecret, totalAmount }: { clientSecret: string, tot
             {isProcessing ? 'Processing...' : 'Pay'}
         </button>
         {error && <div>{error.message}</div>}
+        {message && <p>{message}</p>}
     </div>
     </form>
   );
@@ -60,6 +156,7 @@ const CheckoutForm = ({ clientSecret, totalAmount }: { clientSecret: string, tot
 
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripeId, setStripeId] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const savedCartId = localStorage.getItem('cart_id');
   const {state: cartState} = useCart()
@@ -81,22 +178,35 @@ const { formRef, showConfirm } = useConfirmAddress({
 });
 
   useEffect(() => {
-    async function fetchClientSecret() {
-      const { clientSecret, totalPrice, cartItems } = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_API_URL}/create-payment-intent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ cart_id: savedCartId }), // Example amount in cents
+    const fetchData = async () => {
+      try {
+        const { clientSecret, totalPrice, stripeId } = await fetchClientSecret(String(savedCartId));
+        setTotalPrice(totalPrice);
+        setClientSecret(clientSecret);
+        setStripeId(stripeId);
+
+      } catch (error) {
+        console.error("Error fetching client secret:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const updateData = async () => {
+      try {
+        if(stripeId) {
+          const {clientSecret, totalPrice, stripe_id} = await updateClientSecret(String(savedCartId), String(stripeId));
+          setTotalPrice(totalPrice)
+          setClientSecret(clientSecret)
+          setStripeId(stripe_id);
         }
-      ).then((res) => res.json());
-      setTotalPrice(totalPrice);
-      setClientSecret(clientSecret);
+      } catch(error) {
+        console.log('Error: ', error)
+      }
     }
-    fetchClientSecret();
-  }, [cartState.items, formRef.current]);
+    updateData()
+  }, [cartState.items])
 
   if (!clientSecret) {
     return <div>Loading...</div>;
@@ -110,7 +220,7 @@ const { formRef, showConfirm } = useConfirmAddress({
         <CartLayout />
         <DeliveryForm formData={formData} hasAdditionalFeatures={hasAdditionalFeatures} setFormData={setFormData} formRef={formRef} setMinimapFeature={setMinimapFeature} />
         <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm clientSecret={clientSecret} totalAmount={totalPrice} />
+            <CheckoutForm stripeId={String(stripeId)} clientSecret={clientSecret} totalAmount={totalPrice} formData={formData} />
         </Elements>
     </div>
   );

@@ -30,7 +30,12 @@ export const AsideSelectiveMenu = ({categories}:{categories:Category[]}) => {
   return (
     <div className="flex flex-col gap-y-2">
       <SearchComponent />
-      <div className={`${raleway.className} text-base font-normal border border-gray-200 rounded-xl py-5`}>
+      <div className="collapse border border-gray-200">
+        <input type="checkbox" />
+        <div className="collapse-title text-xl font-medium">Categories</div>
+        <div className="collapse-content">
+          <div className="flex justify-between text-xs mb-2 max-md:justify-start">
+          <div className={`${raleway.className} text-base font-normal border border-gray-200 rounded-xl py-5 w-full`}>
             <ul>
               <li 
               className={ pathname === '/store' ? 'font-semibold bg-[#FBA33D] text-white px-4 py-3' : 'font-normal px-4 py-3'}
@@ -49,6 +54,9 @@ export const AsideSelectiveMenu = ({categories}:{categories:Category[]}) => {
                 })}
             </ul>
       </div>
+          </div>
+    </div>
+  </div>
       <PriceFilterMenu lowestPrice={lowestPrice} highestPrice={highestPrice} />
     </div>
   )
