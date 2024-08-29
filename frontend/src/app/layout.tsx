@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <CartProvider>
         <StoreProvider>
-          <body>{children}</body>
+          <body className="mx-[150px] max-lg:mx-[20px]">{children}</body>
         </StoreProvider>
       </CartProvider>
     </html>

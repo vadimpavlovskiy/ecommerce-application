@@ -4,6 +4,7 @@ import CartComponent from '@/app/components/CartComponent';
 import { Pagination } from '@/app/components/Pagination';
 import { Breadcrumbs } from '@/app/layouts/breadcrumbs/Breadcrumbs';
 import { AsideSelectiveMenu } from '@/app/layouts/categories/AsideSelectiveMenu';
+import { HeaderLayout } from '@/app/layouts/header/HeaderLayout';
 import { AllProducts } from '@/app/layouts/product/AllProducts';
 import { useParams, usePathname } from 'next/navigation';
 import React from 'react'
@@ -15,8 +16,8 @@ const Page = async ({searchParams}:{searchParams:{page?: number, search: string}
   const categories = await fetchCategories();
   return (
     <>
-      <CartComponent />
-      <main className="mx-[150px] max-lg:mx-[20px] flex flex-col">
+      <HeaderLayout />
+      <main className="flex flex-col">
       <Breadcrumbs />
         <div className="flex gap-x-5 max-md:flex-col">
           <AsideSelectiveMenu categories={categories} />

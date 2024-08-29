@@ -4,6 +4,7 @@ import { ProductCard } from '@/app/components/ProductCard';
 import { Features } from '@/app/layouts/Features';
 import { Breadcrumbs } from '@/app/layouts/breadcrumbs/Breadcrumbs';
 import { AsideSelectiveMenu } from '@/app/layouts/categories/AsideSelectiveMenu';
+import { HeaderLayout } from '@/app/layouts/header/HeaderLayout';
 import { AllProducts } from '@/app/layouts/product/AllProducts';
 import ProductDetails from '@/app/layouts/product/ProductDetails';
 import { Category, Product } from '@/app/types/layoutTypes/CategorySection';
@@ -22,8 +23,8 @@ export default async function Page({
     const categories:Category[] = await fetchCategories()
   return (
     <>
-    <CartComponent />
-    <main className="mx-[150px] max-lg:mx-[20px] flex flex-col">
+    <HeaderLayout />
+    <main className="flex flex-col">
     <Breadcrumbs />
       <div className='flex gap-x-5 max-md:flex-col'>
         <AsideSelectiveMenu categories={categories} />

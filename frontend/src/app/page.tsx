@@ -3,10 +3,13 @@ import { Banner } from "./layouts/Banner";
 import { Features } from "./layouts/Features";
 import { HeroSection } from "./layouts/HeroSection";
 import { AllCategories } from "./layouts/AllCategories";
+import { HeaderLayout } from "./layouts/header/HeaderLayout";
 
 export default function Home() {
   return (
-    <main className="mx-[150px] max-lg:mx-[20px]">
+    <>
+    <HeaderLayout />
+    <main>
       <Banner />
       <div className="mt-[2.5rem]">
         <Features />
@@ -34,5 +37,6 @@ export default function Home() {
         <AllCategories />
       </div>
     </main>
+    </>
   );
 }
