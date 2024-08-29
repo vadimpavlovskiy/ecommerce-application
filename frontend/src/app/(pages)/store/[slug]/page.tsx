@@ -2,6 +2,7 @@ import { fetchProductBySlug } from '@/app/api/productApi'
 import CartComponent from '@/app/components/CartComponent';
 import { Features } from '@/app/layouts/Features';
 import { Breadcrumbs } from '@/app/layouts/breadcrumbs/Breadcrumbs';
+import { HeaderLayout } from '@/app/layouts/header/HeaderLayout';
 import ProductDetails from '@/app/layouts/product/ProductDetails';
 import React from 'react'
 
@@ -14,8 +15,8 @@ export default async function Page({
     (productData)
   return (
     <>
-    <main className="mx-[150px] max-lg:mx-[20px]">
-            <CartComponent />
+    <HeaderLayout />
+    <main>
             <Breadcrumbs />
             <ProductDetails productData={productData.products} image={productData.contents} />
             <Features />

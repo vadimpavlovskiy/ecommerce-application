@@ -47,33 +47,34 @@ export default function CartComponent() {
   }, [])
   return (
     <>
-    <div className={`drawer z-50 join drawer-end ${raleway.className}`} >
+    <div className={`drawer z-40 join drawer-end flex w-fit ${raleway.className}`} >
   <input id="my-drawer-4" type="checkbox" className="drawer-toggle peer" />
   <div className="drawer-content">
-    <label htmlFor="my-drawer-4" className="drawer-button">
-      <div className='m-5'>
-        <div className="indicator cursor-pointer">
-          <span className="indicator-item indicator-bottom indicator-start badge badge-warning">    
+    <label htmlFor="my-drawer-4" className="drawer-button z-10">
+      <div className='m-5 z-10'>
+        <div className="indicator cursor-pointer z-10">
+          <span className="indicator-item indicator-bottom indicator-start badge badge-warning z-10">    
             {Object.keys(cartState.items).length}
           </span>
-          <div className="grid h-15 w-16d place-items-center">
+          <div className="grid h-15 place-items-center z-5">
             <Image width={30} height={36} src={'/cart.svg'} alt='' />
           </div>
         </div>
       </div>
     </label>
   </div>
-  <div className="drawer-side ">
+  <div className="drawer-side z-50">
     <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
-    <div className="menu bg-base-200 text-base-content min-h-full w-1/3 p-4 max-md:w-3/4">
-      <h2 className='text-[1.875rem] font-semibold'>Your cart: {Object.keys(cartState.items).length} products</h2>
-      <div className="divider" />
-      <div className="flex flex-col gap-y-7">
-      {cartState.items ? (
+    <div className="menu bg-base-200 text-base-content min-h-full w-1/3 p-4 z-50 max-md:w-3/4">
+      {Object.keys(cartState.items).length ? (
         Object.entries(cartState.items).map(([key, item], index) => {
           return (
+            <>
+            <h2 className='text-[1.875rem] font-semibold'>Your cart: {Object.keys(cartState.items).length} products</h2>
+            <div className="divider" />
+            <div className="flex flex-col gap-y-7">
                   <div className='flex justify-between p-5 items-center max-lg:flex-col' key={index}>
-                    <div className='flex gap-y-5 border-b py-4 items-center max-lg:items-center max-lg:flex-col'>
+                    <div className='flex gap-y-5 border-b py-4 items-center z-50 max-lg:items-center max-lg:flex-col'>
                       <div className='space-y-2 mr-5'>
                         <h3 className='text-xl font-semibold max-lg:text-center'>{item.name}</h3>
                         <Image src={`${item.image}`} alt={item.name} width={200} height={200} />
@@ -104,13 +105,23 @@ export default function CartComponent() {
                       <p className='text-[1.563rem] font-semibold '>{item.totalPrice} $</p>
                     </div>
                   </div>
+                    <Link className='w-full' href={'/checkout/'}><button className="btn btn-info btn-block text-white className='min-w-full'">Go to checkout</button></Link>
+                </div>
+          </>
                 )})
               ) : (
-                <li><a>No items in cart</a></li>
+                <div className='flex flex-col p-5 justify-between items-center min-h-screen'>
+                  <div>
+                    <h2 className='text-[1.875rem] font-semibold'>Your cart is empty</h2>
+                    <div className="divider w-full" />
+                  </div>
+                  <div className='flex flex-col w-full h-3/4 gap-y-72 justify-between items-center'>
+                    <Image src={'/bucket.svg'} width={120} height={100} alt='Your bucket is empty' />
+                    <Link className='w-full' href={'/store/'}><button className="btn btn-info btn-block text-white className='min-w-full'">Go to store</button></Link>
+                  </div>
+                </div>
               )}
       </div>
-      <Link className='w-full' href={'/checkout/'}><button className="btn btn-info btn-block text-white className='min-w-full'">Go to checkout</button></Link>
-    </div>
   </div>
 </div>
     </>
