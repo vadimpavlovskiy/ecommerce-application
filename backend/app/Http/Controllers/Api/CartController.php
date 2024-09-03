@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
+use App\Models\Sku;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,74 +16,33 @@ class CartController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'cart_id' => 'required|string',
-            'productId' => 'required|numeric|exists:products,id',
-            'color' => 'required|string',
-            'textile' => 'required|string',
-            'matress' => 'required|string',
+            'sku' => 'required|numeric|exists:skus,id',
             'additionalFeatures' => 'array',
             'quantity' => 'required|numeric|min:1',
         ]);
 
         $cart = Cart::firstOrCreate(['cart_id' => $validatedData['cart_id']]);
-        $product = Product::findOrFail($validatedData['productId']);
-        $totalPrice = $product->discounted_price ? $product->discounted_price : $product->price;
-        $items = json_decode($cart->items, true) ?: [];
-
-        foreach ($product->custom_properties as $property) {
-            if ($property['type'] === 'color' && strtolower($property['name']) === strtolower($validatedData['color'])) {
-                $totalPrice += $property['price'];
-            }
-            if ($property['type'] === 'textile' && strtolower($property['name']) === strtolower($validatedData['textile'])) {
-                $totalPrice += $property['price'];
-            }
-        }
+        $sku = Sku::findOrFail($validatedData['sku']);
+        $product = Product::findOrFail($sku->product_id);
+        $totalPrice = $sku->discounted_price ? $sku->discounted_price : $sku->price;
 
         if (!empty($validatedData['additionalFeatures'])) {
             foreach ($validatedData['additionalFeatures'] as $feature) {
-                foreach ($product->custom_properties as $property) {
-                    if ($property['type'] === 'additional_features' && strtolower($property['name']) === strtolower($feature)) {
-                        $totalPrice += $property['price'];
+                foreach ($product->features as $product_feature) {
+                    if (is_string($product_feature['name']) && strtolower($product_feature['name']) === strtolower($feature['name'])) {
+                        $totalPrice += $product_feature['price'];
                         break;
                     }
                 }
             }
         }
 
-        // Generate a unique key for the product configuration
-        $productKey = $validatedData['productId'] . '-' . $validatedData['color'] . '-' . $validatedData['textile'] . '-' . $validatedData['matress'] . '-' . implode('-', $validatedData['additionalFeatures']);
-
-        if (isset($items[$productKey])) {
-            $items[$productKey]['quantity'] += $validatedData['quantity'];
-            $items[$productKey]['totalPrice'] = $totalPrice * $items[$productKey]['quantity'];
-            
-        } else {
-            $items[$productKey] = [
-                'productId' => $validatedData['productId'],
-                'name' => $product['name'],
-                'image' => $product['image'],
-                'color' => $validatedData['color'],
-                'textile' => $validatedData['textile'],
-                'matress' => $validatedData['matress'],
-                'additionalFeatures' => $validatedData['additionalFeatures'],
-                'quantity' => $validatedData['quantity'],
-                'totalPrice' => $totalPrice * $validatedData['quantity'],
-            ];
-        }
-        unset($items[$productKey]['cart_id']);
-
-        $cart->items = json_encode($items);
-        $cart->save();
-
-        $cartItems = collect($items)->map(function ($product) {
-            $product['image'] = Storage::url($product['image']);
-            return $product;
-        })->toArray();
-    
 
         return response()->json([
             'message' => 'Product added to cart successfully',
-            'cart' => $cartItems,
-            'total_price' => $cartItems[$productKey]
+            'cart' => $cart,
+            'sku'=>$sku,
+            'total_price' => $totalPrice,
         ], 201);
 
 
@@ -126,7 +86,7 @@ class CartController extends Controller
                     $totalPrice += $property['price'];
                 }
             }
-    
+
             if (!empty($items[$validatedData['key']]['additionalFeatures'])) {
                 foreach ($items[$validatedData['key']]['additionalFeatures'] as $feature) {
                     foreach ($product->custom_properties as $property) {
@@ -138,13 +98,13 @@ class CartController extends Controller
                 }
             }
             $totalPrice *= $validatedData['quantity'];
-            
+
             $items[$validatedData['key']]['quantity'] = (int)$validatedData['quantity'];
             $items[$validatedData['key']]['totalPrice'] = $totalPrice;
         } else {
             return response()->json(['message' => 'Item not found'], 404);
         }
-        
+
         // Encode the items back to JSON and save
         $cart->items = json_encode($items);
         $cart->save();
@@ -152,7 +112,7 @@ class CartController extends Controller
         $items = collect($items)->map(function ($item) {
             $item['image'] = Storage::url($item['image']);
             return $item;
-        })->toArray();    
+        })->toArray();
 
         return response()->json(['message' => 'Updated', 'items'=> $items, 'total'=>$totalPrice]);
     }
@@ -174,9 +134,9 @@ class CartController extends Controller
 
         $cart->items = json_encode($items);
         $cart->save();
-    
+
         return response()->json(['message' => 'Item deleted', 'items' => $items]);
-    
+
     }
 
     public function destroy ( Request $request) {

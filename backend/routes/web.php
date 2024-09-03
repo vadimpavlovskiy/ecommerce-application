@@ -16,7 +16,7 @@ Route::get('/', function () {
 Route::controller(ProductController::class)->group(function () {
     Route::get('/api/products', [ProductController::class, 'index']);
     Route::get('/api/products/search', [ProductController::class, 'search']);
-    Route::get('/api/products/{id}', [ProductController::class, 'show']);
+    Route::get('/api/products/{slug}', [ProductController::class, 'show']);
 });
 
 Route::controller(ApiCategoryController::class)->group(function () {
@@ -40,6 +40,6 @@ Route::controller(CartController::class)->group(function () {
     Route::get('/api/cart', [CartController::class, 'show']);
 });
 
-Route::post('/api/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
-Route::put('/api/update-payment-intent', [PaymentController::class, 'updatePaymentIntent']);
+// Route::post('/api/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
+// Route::put('/api/update-payment-intent', [PaymentController::class, 'updatePaymentIntent']);
 

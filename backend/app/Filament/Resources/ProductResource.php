@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Attribute;
+use App\Models\AttributeOption;
 use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
@@ -47,7 +49,6 @@ class ProductResource extends Resource
                 }),
             TextInput::make('slug')->required()->maxLength(255),
                 RichEditor::make('description')->required()->maxLength(1200)->columnSpan('full'),
-                TextInput::make('sku')->required()->minLength(5)->maxLength(300)->required()->string(),
                 FileUpload::make('image')
                 ->required()
                 ->disk('spaces')
@@ -55,7 +56,7 @@ class ProductResource extends Resource
                 ->preserveFilenames()
                 ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file) {
                     return $file->getClientOriginalName();
-                })            
+                })
                 ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
                     $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
                     $filename = $file->getClientOriginalName();
@@ -77,96 +78,107 @@ class ProductResource extends Resource
                     'Length'=>TextInput::make('length')->required()->numeric(),
                     'Width' => TextInput::make('width')->required()->numeric(),
                     'Height' => TextInput::make('height')->required()->numeric(),
-                    'Sleeping Area Length' => TextInput::make('sleeping_area_length')->required()->numeric(),
-                    'Sleeping Area Width' => TextInput::make('sleeping_area_width')->required()->numeric(),
                 ]),
-                Section::make('Price')
-                ->description('Prices of product')
+                Section::make('Custom Properties')
                 ->schema([
-                    'Regular price' => TextInput::make('price')->numeric()->required()->prefix('$')->maxValue(9999999.99),
-                    'Discount' => Checkbox::make('is_discount')
-                        ->reactive()
-                        ->formatStateUsing(function (Get $get, Set $set, $state) {
-                            if($get('discounted_price') !== null && $get('discounted_price') > 0.0 && $get('discounted_price') !== 0) {
-                                return true;
-                            } else {
-                                 {
-                                    return false;
-                                };
-                            }
-                        })
-                        ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                            if($state) {
-                                $set('discounted_price', $get('discounted_price'));
-                            } else {
-                                $set('discounted_price', 0);
-                                $set('is_discount', false);
-                            }
-                        }),
-                    'Discrounted Price' => TextInput::make('discounted_price')->numeric()->prefix('$')->maxValue(9999999.99)->visible(fn (Get $get): bool => $get('is_discount') || $get('discounted_price') !== null || $get('discounted_price') > 0.0 || $get('discounted_price' !== 0))->nullable()->live()
-                ]),
-                Repeater::make('custom_properties')
-                ->schema([
-                    Select::make('type')->options([
-                        'characteristic' => 'Characteristic',
-                        'color' => 'Color',
-                        'textile' => 'Textile',
-                        'additional_features' => 'Additional features'
+                    Repeater::make('custom_properties')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('key')->required()->label('Property Name'),
+                            TextInput::make('value')->required()->label('Property Value'),
+                        ])
                     ])
-                    ->live()
-                    ->afterStateUpdated(fn (Set $set, Get $get) => $set('dynamicTypeFields', $get('type'))),
-                    Grid::make(2)
-                        ->schema(fn (Get $get): array => match ($get('dynamicTypeFields')) {
-                            'color' => [
-                                TextInput::make('name')->required()->label('Color Name'),
-                                FileUpload::make('color_image')
-                                ->required()
-                                ->label('Color Image')
-                                ->required()
-                                ->disk('spaces')
-                                ->directory('colors')
-                                ->preserveFilenames()
-                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file) {
-                                    return $file->getClientOriginalName();
-                                })            
-                                ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
-                                    $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
-                                    $filename = $file->getClientOriginalName();
-                                    return $file->{$storeMethod}($component->getDirectory(), $filename, $component->getDiskName());
-                                })
-                                ->deleteUploadedFileUsing(function ($file) {
-                                    Storage::disk('spaces')->delete('products/'. $file);
-                                })
-                                ->imagePreviewHeight('250')
-                                ->imageCropAspectRatio('1:1')
-                                ->imageResizeTargetWidth('500')
-                                ->imageResizeTargetHeight('500')
-                                ->image()
-                                ->nullable(false),
-                                TextInput::make('price')->required()->label('Color Price')->numeric(),
-                            ],
-                            'characteristic' => [
-                                TextInput::make('key')->required()->label('Property Name'),
-                                TextInput::make('value')->required()->label('Property Value'),
-                            ],
-                            'textile' => [
-                                TextInput::make('name')->required()->label('Textile Name'),
-                                TextInput::make('price')->required()->label('Add to price')->numeric(),
-                            ],
-                            'additional_features' => [
-                                TextInput::make('name') -> label('Feature Name') -> required(),
-                                TextInput::make('price') -> label('Feature Price')  -> numeric() -> required()
-                            ],
-                            default => [],
-                        })
-                        ->key('dynamicTypeFields'),
-                ])
-                ->label('Custom Properties')
-                ->defaultItems(1)
-                ->columns(2)
-                ->minItems(0)
-                ->columnSpanFull()
+                    ->columns(1)
+                    ->label('Custom Properties')
+                    ->minItems(1)
+                    ,
+                ]),
+                Section::make('SKUs and Attributes')
+                    ->schema([
+                        Repeater::make('skus')
+                            ->relationship('skus')
+                            ->schema([
+                                TextInput::make('code')->label('SKU Code')->required(),
+                                TextInput::make('price')->label('Price')->required()->numeric(),
+                                TextInput::make('discounted_price')->label('Discounted Price')->numeric(),
+                                // Attributes and options for each SKU
+                                Repeater::make('images')
+            ->relationship('images')
+            ->schema([
+                FileUpload::make('name')
+                ->required()
+                ->disk('spaces')
+                ->directory('products')
+                ->preserveFilenames()
+                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file) {
+                    return $file->getClientOriginalName();
+                })
+                    ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
+                        $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
+                        $filename = $file->getClientOriginalName();
+                        return $file->{$storeMethod}($component->getDirectory(), $filename, $component->getDiskName());
+                    })
+                    ->deleteUploadedFileUsing(function ($file) {
+                        Storage::disk('spaces')->delete('products/'. $file);
+                    })
+                    ->imagePreviewHeight('250')
+                    ->imageCropAspectRatio('1:1')
+                    ->imageResizeTargetWidth('500')
+                    ->imageResizeTargetHeight('500')
+                    ->image()
+                    ->nullable(false),
+            ]),
+                                Repeater::make('attribute_options')
+                                    ->relationship('attributeOptions')
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                Select::make('attribute_id')
+                                                    ->label('Attribute')
+                                                    ->options(Attribute::all()->pluck('name', 'id'))
+                                                    ->reactive()
+                                                    ->required()
+                                                    ->searchable()
+                                                    ->afterStateUpdated(fn ($state, Set $set) => $set('attribute_option_id', null))
+                                                    ->createOptionForm([
+                                                        Forms\Components\TextInput::make('name')
+                                                            ->label('Attribute Name')
+                                                            ->required(),
+                                                    ])
+                                                    ->createOptionUsing(function (array $data) {
+                                                        $attribute = Attribute::create(['name' => $data['name']]);
+                                                        return $attribute->id;
+                                                    }),
+                                                Select::make('attribute_option_id')
+                                                    ->label('Option')
+                                                    ->options(fn ($get) => AttributeOption::where('attribute_id', $get('attribute_id'))->pluck('value', 'id'))
+                                                    ->searchable()
+                                                    ->required()
+                                                    ->createOptionForm([
+                                                        Forms\Components\TextInput::make('value')
+                                                            ->label('Attribute Option')
+                                                            ->required(),
+                                                    ])
+                                                    ->createOptionUsing(function (array $data, $get) {
+                                                        $attributeOption = AttributeOption::create([
+                                                            'attribute_id' => $get('attribute_id'),
+                                                            'value' => $data['value'],
+                                                        ]);
+                                                        return $attributeOption->id;
+                                                    })
+                                            ]),
+                                    ])
+                                    ->label('Attributes')
+                                    ->columns(1)
+                                    ->minItems(1),
+                            ])
+                            ->columns(1)
+                            ->minItems(1)
+                            ->label('SKUs'),
+                    ])
+                    ->columns(1),
             ]);
+
     }
 
     public static function table(Table $table): Table
@@ -174,10 +186,15 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('sku'),
                 TextColumn::make('price')->money('USD')->sortable(),
                 TextColumn::make('discounted_price')->money('USD')->sortable(),
-                TextColumn::make('created_at')->dateTime()
+                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('skus.code')->label('SKU Code')->limit(20),
+                TextColumn::make('skus.attributeOptions.value')
+                    ->label('Attributes')
+                    ->limit(50),
+                TextColumn::make('created_at')->label('Created At')->dateTime(),
+
             ])
             ->filters([
                 //
@@ -199,6 +216,7 @@ class ProductResource extends Resource
         ];
     }
 
+
     public static function getPages(): array
     {
         return [
@@ -210,7 +228,27 @@ class ProductResource extends Resource
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        unset($data['is_discount']);
+        foreach ($data['skus'] as &$sku) {
+            foreach ($sku['attribute_options'] as &$option) {
+                // Handle new attribute creation
+                if (isset($option['new_attribute']) && !empty($option['new_attribute'])) {
+                    $attribute = Attribute::create(['name' => $option['new_attribute']]);
+                    $option['attribute_id'] = $attribute->id;
+                    unset($option['new_attribute']);
+                }
+
+                // Handle new attribute option creation
+                if (isset($option['new_option']) && !empty($option['new_option'])) {
+                    $attributeOption = AttributeOption::create([
+                        'attribute_id' => $option['attribute_id'],
+                        'value' => $option['new_option'],
+                    ]);
+                    $option['attribute_option_id'] = $attributeOption->id;
+                    unset($option['new_option']);
+                }
+            }
+        }
+
         return $data;
     }
 
