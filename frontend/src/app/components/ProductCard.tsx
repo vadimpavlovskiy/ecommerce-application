@@ -7,7 +7,6 @@ import Image from 'next/image'
 const raleway = Raleway({ subsets: ['latin'], weight: ['600', '300'] })
 
 export const ProductCard = ({product}:{product:Product}) => {
-  (product)
   return (
     <div className={`${raleway.className} text-2xl flex max-w-fit max-md:max-w-full`}>
               <Link href={`/store/${product.slug}`} className='flex flex-col items-center justify-center max-md:w-full max-md:text-center'>
@@ -23,8 +22,8 @@ export const ProductCard = ({product}:{product:Product}) => {
                   <span className='flex items-center'><Image src={'/height.svg'} alt='Product length' width={10} height={10} className='mr-1'/>H: {product.height}</span>
                 </div>
                 <div className='text-[#252525] text-center'>
-                  <p className="line-through text-base">{product.price} $</p>
-                  <p className="text-2xl font-semibold">{product.discounted_price} $</p>
+                  <p className="line-through text-base">{product.skus[0].price} $</p>
+                  <p className="text-2xl font-semibold">{product.skus[0].discounted_price} $</p>
                 </div>
                 </div>
               </Link>

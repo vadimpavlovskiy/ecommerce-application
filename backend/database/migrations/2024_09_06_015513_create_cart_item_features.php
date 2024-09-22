@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
+        Schema::create('cart_item_features', function (Blueprint $table) {
             $table->id();
-            $table->string('cart_id');
+            $table->foreignIdFor(\App\Models\CartItem::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Feature::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
-
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carts');
+        Schema::dropIfExists('cart_item_features');
     }
 };

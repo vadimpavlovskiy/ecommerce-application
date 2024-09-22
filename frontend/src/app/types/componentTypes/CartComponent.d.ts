@@ -1,3 +1,5 @@
+import { Feature } from "@/app/types/layoutTypes/CategorySection";
+
 export interface CartItem {
   key: string;
   name: string;
@@ -11,11 +13,7 @@ export interface CartItem {
 
 export interface OrderData {
   cart_id: string;
-  productId: string;
-  sku: string;
-  color: string;
-  textile: string | null;
-  matress: string;
-  additionalFeatures: string[];
+  sku: number;
+  additionalFeatures: Feature[];
   quantity: number;
 }

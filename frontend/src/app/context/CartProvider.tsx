@@ -15,14 +15,17 @@ interface CartItem {
 }
 
 interface CartState {
-  items:  { [key: string]: CartItem };
+  items: { [key: string]: CartItem };
+  totalPrice: number; // Total price must be a number
+
 }
 const initialState: CartState = {
   items: {},
+  totalPrice: 0
 };
 
 type CartAction =
-  | { type: 'SET_CART'; payload: { [key: string]: CartItem }  }
+  | { type: 'SET_CART'; payload: { items: { [key: string]: CartItem }, totalPrice: number } }
   | { type: 'UPDATE_CART'; payload: { [key: string]: CartItem } }
   | { type: 'DELETE_ITEM'; payload: string }
   | { type: 'ADD_ITEMS'; payload: { [key: string]: CartItem } }
@@ -35,7 +38,8 @@ const cartReducer = (state: CartState = initialState, action: CartAction): CartS
     case 'SET_CART':
       return {
         ...state,
-        items: { ...state.items, ...action.payload },
+        items: { ...state.items, ...action.payload.items },
+        totalPrice: action.payload.totalPrice
       }
     case 'UPDATE_CART':
       return {

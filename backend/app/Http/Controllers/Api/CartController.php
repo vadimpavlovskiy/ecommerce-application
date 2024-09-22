@@ -24,25 +24,10 @@ class CartController extends Controller
         $cart = Cart::firstOrCreate(['cart_id' => $validatedData['cart_id']]);
         $sku = Sku::findOrFail($validatedData['sku']);
         $product = Product::findOrFail($sku->product_id);
-        $totalPrice = $sku->discounted_price ? $sku->discounted_price : $sku->price;
-
-        if (!empty($validatedData['additionalFeatures'])) {
-            foreach ($validatedData['additionalFeatures'] as $feature) {
-                foreach ($product->features as $product_feature) {
-                    if (is_string($product_feature['name']) && strtolower($product_feature['name']) === strtolower($feature['name'])) {
-                        $totalPrice += $product_feature['price'];
-                        break;
-                    }
-                }
-            }
-        }
-
-
+        $res = $cart->addItem($sku->id, $validatedData['additionalFeatures'], $validatedData['quantity']);
         return response()->json([
-            'message' => 'Product added to cart successfully',
+            'message' => "Created!",
             'cart' => $cart,
-            'sku'=>$sku,
-            'total_price' => $totalPrice,
         ], 201);
 
 
@@ -51,18 +36,37 @@ class CartController extends Controller
 
     public function show (Request $request) {
         $validatedData = $request->validate([
-            'cart_id' => 'required|string'
+            'cart_id' => 'required|string' // Assuming 'cart_id' is an integer
         ]);
 
-        $cart = Cart::where('cart_id', $validatedData['cart_id'])->first();
+        try {
+            // Fetch the cart using the validated 'cart_id'
+            // Include the necessary relationships if they affect pricing calculations
+            $cart = Cart::with(['items.sku.product', 'items.features', 'items.sku.attributeOptions.attribute'])
+                ->where('cart_id', $validatedData['cart_id'])
+                ->firstOrFail();
 
-        $items = json_decode($cart->items, true); // Decode as an associative array
-        $items = collect($items)->map(function ($product) {
-            $product['image'] = Storage::url($product['image']);
-            return $product;
-        })->toArray();
-        $cart->items = json_encode($items);
-        return response()->json(json_decode($cart->items));
+                foreach($cart->items as $val) {
+                    $product = $val->sku->product;
+                    $product->image = Storage::url($product->image);
+                }
+            // Access the total price attribute which needs to be defined in the Cart model
+            $totalPrice = $cart->total_price;
+
+            // Return the cart data and the total price in a JSON response
+            return response()->json([
+                'cart' => $cart,
+                'totalPrice' => $totalPrice,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle the case where the cart is not found
+            return response()->json(['message' => 'Cart not found', $validatedData['cart_id']], 404);
+        }
+
+        return response()->json([
+            'cart' => $cart,
+            'totalPrice' => $totalPrice,
+        ]);
 
     }
 

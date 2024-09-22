@@ -14,6 +14,7 @@ const Page = async ({searchParams}:{searchParams:{page?: number, search: string}
   const search = searchParams.search || '';
   const data = !search ? await fetchAllProducts() : await searchProduct({page: currentPage, searchValue: search});
   const categories = await fetchCategories();
+  console.log(data)
   return (
     <>
       <HeaderLayout />

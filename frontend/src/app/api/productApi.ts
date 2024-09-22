@@ -18,6 +18,7 @@ export const fetchProductBySlug = async (slug: string) => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_API_URL}/products/${slug}`
     );
+    console.log(response)
     return response.data;
   } catch (error) {
     console.log(error);
